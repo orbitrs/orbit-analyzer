@@ -1,16 +1,16 @@
 [package]
 name = "orbit-analyzer"
-version.workspace = true
-edition.workspace = true
-authors.workspace = true
-license.workspace = true
-repository.workspace = true
+version = "0.1.0"
+edition = "2021"
+authors = ["Orbit Team <orbit@example.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/orbitrs/orbit-analyzer"
 readme = "README.md"
 description = "Static analysis tool for Orbit UI framework files"
 
 [dependencies]
 # Core dependencies
-orbit = { path = "../orbit" }
+orbit = { version = "0.1.0", path = "../orbit" }
 
 # Parser libraries
 syn = { version = "2.0", features = ["full", "extra-traits"] }
@@ -18,12 +18,12 @@ quote = "1.0"
 proc-macro2 = "1.0"
 
 # Serialization
-serde.workspace = true
-serde_json.workspace = true
+serde = { workspace = true }
+serde_json = { workspace = true }
 
 # Error handling
-thiserror.workspace = true
-log.workspace = true
+thiserror = { workspace = true }
+log = { workspace = true }
 
 # CLI support
 clap = { version = "4.4", features = ["derive"] }
