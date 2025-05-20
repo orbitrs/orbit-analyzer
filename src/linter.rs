@@ -1,8 +1,8 @@
 // Linter for checking .orbit files
 
-use crate::rules::Rule;
-use crate::reporter::Issue;
 use crate::parser;
+use crate::reporter::Issue;
+use crate::rules::Rule;
 use crate::{AnalyzerError, Result};
 
 /// Linter for .orbit files
@@ -19,25 +19,26 @@ impl Linter {
             ],
         }
     }
-    
+
     /// Add a rule to the linter
     pub fn add_rule<R: Rule + 'static>(&mut self, rule: R) {
         self.rules.push(Box::new(rule));
     }
-    
+
     /// Lint a file and return issues
     pub fn lint(&self, content: &str, file_path: &str) -> Result<Vec<Issue>> {
         let orbit_file = parser::parse_orbit_file(content, file_path)?;
-        
+
         let mut issues = Vec::new();
-        
+
         for rule in &self.rules {
-            let rule_issues = rule.check(&orbit_file, file_path)
+            let rule_issues = rule
+                .check(&orbit_file, file_path)
                 .map_err(|e| AnalyzerError::Rule(e.to_string()))?;
-            
+
             issues.extend(rule_issues);
         }
-        
+
         Ok(issues)
     }
 }

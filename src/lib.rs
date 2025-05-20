@@ -1,16 +1,16 @@
 // Static analysis tool for Orbit UI framework files
 
-mod rules;
 mod linter;
 mod parser;
 mod reporter;
+mod rules;
 
 use thiserror::Error;
 
 /// Export public API
 pub use linter::Linter;
+pub use reporter::{Issue, Reporter, Severity};
 pub use rules::Rule;
-pub use reporter::Reporter;
 
 /// Version of the Orbit Analyzer
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -20,10 +20,10 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 pub enum AnalyzerError {
     #[error("Parser error: {0}")]
     Parser(String),
-    
+
     #[error("Rule error: {0}")]
     Rule(String),
-    
+
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 }
