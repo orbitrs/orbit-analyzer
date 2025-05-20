@@ -1,0 +1,33 @@
+[package]
+name = "orbit-analyzer"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+description = "Static analysis tool for Orbit UI framework files"
+
+[dependencies]
+# Core dependencies
+orbit = { path = "../orbit" }
+
+# Parser libraries
+syn = { version = "2.0", features = ["full", "extra-traits"] }
+quote = "1.0"
+proc-macro2 = "1.0"
+
+# Error handling
+thiserror.workspace = true
+log.workspace = true
+
+# CLI support
+clap = { version = "4.4", features = ["derive"] }
+
+[lib]
+name = "orbit_analyzer"
+path = "src/lib.rs"
+
+[[bin]]
+name = "orbit-analyzer"
+path = "src/main.rs"
