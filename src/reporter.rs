@@ -1,7 +1,8 @@
 // Reporter for lint issues
+use serde::{Deserialize, Serialize};
 
 /// Issue severity
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum Severity {
     /// Error - must be fixed
     Error,
@@ -22,7 +23,7 @@ impl std::fmt::Display for Severity {
 }
 
 /// Lint issue
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Issue {
     /// Name of the rule that found the issue
     pub rule: String,
@@ -45,7 +46,7 @@ pub struct Reporter {
 }
 
 /// Report format
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 enum ReportFormat {
     /// Plain text
     Text,
@@ -60,14 +61,14 @@ impl Reporter {
             format: ReportFormat::Text,
         }
     }
-    
+
     /// Create a new JSON reporter
     pub fn new_json() -> Self {
         Self {
             format: ReportFormat::Json,
         }
     }
-    
+
     /// Report issues
     pub fn report_issues(&self, file_path: &str, issues: &[Issue]) {
         match self.format {
@@ -75,34 +76,29 @@ impl Reporter {
             ReportFormat::Json => self.report_json(file_path, issues),
         }
     }
-    
+
     /// Report issues in text format
     fn report_text(&self, file_path: &str, issues: &[Issue]) {
         if issues.is_empty() {
             println!("{}: No issues found", file_path);
             return;
         }
-        
+
         println!("{}: {} issues found", file_path, issues.len());
-        
+
         for issue in issues {
             println!(
                 "  {}:{}:{}: [{}] {} ({})",
-                issue.file,
-                issue.line,
-                issue.column,
-                issue.severity,
-                issue.message,
-                issue.rule,
+                issue.file, issue.line, issue.column, issue.severity, issue.message, issue.rule,
             );
         }
     }
-    
+
     /// Report issues in JSON format
     fn report_json(&self, _file_path: &str, issues: &[Issue]) {
         let json = serde_json::to_string_pretty(&issues)
             .unwrap_or_else(|_| "Error serializing issues".to_string());
-        
+
         println!("{}", json);
     }
 }

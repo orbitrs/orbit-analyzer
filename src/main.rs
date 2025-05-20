@@ -23,7 +23,7 @@ struct LintArgs {
     /// Files to analyze
     #[arg(required = true)]
     files: Vec<PathBuf>,
-    
+
     /// Output format (text, json)
     #[arg(short, long, default_value = "text")]
     format: String,
@@ -31,14 +31,14 @@ struct LintArgs {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
-    
+
     match cli.command {
         Commands::Lint(args) => {
             let reporter = match args.format.as_str() {
                 "json" => Reporter::new_json(),
                 _ => Reporter::new_text(),
             };
-            
+
             for file in args.files {
                 let file_path = file.to_string_lossy();
                 match analyze_file(&file_path) {
@@ -52,6 +52,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
     }
-    
+
     Ok(())
 }
