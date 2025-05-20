@@ -22,8 +22,11 @@ Orbit Analyzer enables deeper insights into your codebase by combining syntax ch
 
 * **Syntax Validation:** Parse `.orbit` files and verify their structure (markup, style, script).
 * **Semantic Analysis:** Analyze Rust code embedded in components for logical correctness.
+* **Renderer-Aware Analysis:** 
+    * Validate component metadata for renderer preferences (Skia/WGPU).
+    * Check for optimal usage of renderer-specific features.
 * **Code Metrics:** Calculate complexity, size, and other useful metrics.
-* **Custom Lint Rules:** Easily add or modify linting rules based on team requirements.
+* **Custom Lint Rules:** Easily add or modify linting rules, including renderer-specific ones.
 * **Cross-platform CLI:** Command-line interface for easy integration and usage.
 * **Detailed Reports:** Generate human-readable and machine-readable analysis reports.
 * **WASM Support:** Potential to run analysis in-browser or in other WASM environments.
@@ -81,10 +84,18 @@ syntax_check = true
 semantic_analysis = true
 metrics_enabled = true
 
+[renderer_analysis]
+enabled = true
+default_renderer = "auto" # options: "auto", "skia", "wgpu"
+check_renderer_metadata = true
+
 [lint]
 no_unused_variables = true
 prefer_const_let = true
 max_function_length = 50
+# Renderer-specific lint rules
+wgpu_specific_optimizations = "warn"
+skia_vector_usage = "info"
 
 [report]
 format = "json"  # options: "json", "text"
