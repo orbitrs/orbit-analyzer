@@ -3,13 +3,10 @@
 use crate::AnalyzerError;
 use crate::Result;
 use orbit::parser::{OrbitAst, OrbitParser};
-use std::path::Path;
-use std::fs;
 
 /// Parse an .orbit file
-pub fn parse_orbit_file(content: &str, file_path: &str) -> Result<OrbitAst> {
-    OrbitParser::parse(content)
-        .map_err(|e| AnalyzerError::Parser(e.to_string()))
+pub fn parse_orbit_file(content: &str, _file_path: &str) -> Result<OrbitAst> {
+    OrbitParser::parse(content).map_err(|e| AnalyzerError::Parser(e.to_string()))
 }
 
 /// Extract component name from an .orbit file
@@ -19,7 +16,7 @@ pub fn extract_component_name(ast: &OrbitAst) -> Option<String> {
     if !ast.script.component_name.is_empty() {
         return Some(ast.script.component_name.clone());
     }
-    
+
     None
 }
 
@@ -28,7 +25,7 @@ pub fn extract_component_name(ast: &OrbitAst) -> Option<String> {
 pub fn parse_component_props(ast: &OrbitAst) -> Result<Vec<PropInfo>> {
     // In the orbit crate's current implementation, we can directly access the props from the AST
     let mut props = Vec::new();
-    
+
     // Convert the props from the AST to our PropInfo format
     for prop in &ast.script.props {
         props.push(PropInfo {
@@ -38,7 +35,7 @@ pub fn parse_component_props(ast: &OrbitAst) -> Result<Vec<PropInfo>> {
             doc: None, // AST doesn't currently store doc comments
         });
     }
-    
+
     // Return the collected properties
 
     Ok(props)

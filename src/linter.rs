@@ -16,6 +16,8 @@ impl Linter {
         Self {
             rules: vec![
                 // Add default rules here
+                Box::new(crate::rules::NonEmptyTemplateRule),
+                Box::new(crate::rules::PublicFunctionRule),
             ],
         }
     }

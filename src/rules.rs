@@ -42,7 +42,7 @@ impl Rule for NonEmptyTemplateRule {
                         severity: crate::reporter::Severity::Warning,
                     });
                 }
-            },
+            }
             // Text or Expression nodes are not considered "empty" templates
             _ => {}
         }
@@ -64,10 +64,19 @@ impl Rule for PublicFunctionRule {
     }
 
     fn check(&self, ast: &OrbitAst, _file_path: &str) -> Result<Vec<Issue>, String> {
-        let issues = Vec::new();
+        let mut issues = Vec::new();
 
-        // This is a placeholder implementation
-        // In a real implementation, we would parse the Rust code and check for public functions
+        // Check if there are any methods defined in the component
+        if ast.script.methods.is_empty() {
+            issues.push(Issue {
+                rule: self.name().to_string(),
+                message: "Component has no public methods".to_string(),
+                file: _file_path.to_string(),
+                line: 1,   // Placeholder
+                column: 1, // Placeholder
+                severity: crate::reporter::Severity::Info,
+            });
+        }
 
         Ok(issues)
     }
