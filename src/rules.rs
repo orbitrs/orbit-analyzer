@@ -30,22 +30,19 @@ impl Rule for NonEmptyTemplateRule {
     fn check(&self, ast: &OrbitAst, file_path: &str) -> Result<Vec<Issue>, String> {
         let mut issues = Vec::new();
 
-        match &ast.template {
-            orbit::parser::TemplateNode::Element { children, .. } => {
-                if children.is_empty() {
-                    issues.push(Issue {
-                        rule: self.name().to_string(),
-                        message: "Template section is empty".to_string(),
-                        file: file_path.to_string(),
-                        line: 1,   // Placeholder
-                        column: 1, // Placeholder
-                        severity: crate::reporter::Severity::Warning,
-                    });
-                }
+        if let orbit::parser::TemplateNode::Element { children, .. } = &ast.template {
+            if children.is_empty() {
+                issues.push(Issue {
+                    rule: self.name().to_string(),
+                    message: "Template section is empty".to_string(),
+                    file: file_path.to_string(),
+                    line: 1,   // Placeholder
+                    column: 1, // Placeholder
+                    severity: crate::reporter::Severity::Warning,
+                });
             }
-            // Text or Expression nodes are not considered "empty" templates
-            _ => {}
         }
+        // Text or Expression nodes are not considered "empty" templates
 
         Ok(issues)
     }

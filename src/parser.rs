@@ -56,6 +56,7 @@ pub struct PropInfo {
 }
 
 /// Parse a property definition line
+#[allow(dead_code)]
 fn parse_prop_line(line: &str) -> Option<PropInfo> {
     // Parse lines like "pub name: String,"
     let line = line.strip_prefix("pub ")?;

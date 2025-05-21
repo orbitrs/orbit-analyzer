@@ -10,7 +10,7 @@ description = "Static analysis tool for Orbit UI framework files"
 
 [dependencies]
 # Core dependencies
-orbit = { version = "0.1.0", path = "../orbit" }
+orbit = { version = "0.1.0", git = "https://github.com/orbitrs/orbit.git", branch = "main" }
 
 # Parser libraries
 syn = { version = "2.0", features = ["full", "extra-traits"] }
