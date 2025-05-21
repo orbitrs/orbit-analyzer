@@ -1,7 +1,7 @@
 // Rules for checking .orbit files
 
 use crate::reporter::Issue;
-use orbit::parser::OrbitFile;
+use orbit::parser::OrbitAst;
 
 /// Trait for lint rules
 pub trait Rule {
@@ -12,7 +12,7 @@ pub trait Rule {
     fn description(&self) -> &'static str;
 
     /// Check an .orbit file for issues
-    fn check(&self, file: &OrbitFile, file_path: &str) -> Result<Vec<Issue>, String>;
+    fn check(&self, ast: &OrbitAst, file_path: &str) -> Result<Vec<Issue>, String>;
 }
 
 /// Rule for checking if template is empty
@@ -27,18 +27,24 @@ impl Rule for NonEmptyTemplateRule {
         "Template section should not be empty"
     }
 
-    fn check(&self, file: &OrbitFile, file_path: &str) -> Result<Vec<Issue>, String> {
+    fn check(&self, ast: &OrbitAst, file_path: &str) -> Result<Vec<Issue>, String> {
         let mut issues = Vec::new();
 
-        if file.template.is_empty() {
-            issues.push(Issue {
-                rule: self.name().to_string(),
-                message: "Template section is empty".to_string(),
-                file: file_path.to_string(),
-                line: 1,   // Placeholder
-                column: 1, // Placeholder
-                severity: crate::reporter::Severity::Warning,
-            });
+        match &ast.template {
+            orbit::parser::TemplateNode::Element { children, .. } => {
+                if children.is_empty() {
+                    issues.push(Issue {
+                        rule: self.name().to_string(),
+                        message: "Template section is empty".to_string(),
+                        file: file_path.to_string(),
+                        line: 1,   // Placeholder
+                        column: 1, // Placeholder
+                        severity: crate::reporter::Severity::Warning,
+                    });
+                }
+            },
+            // Text or Expression nodes are not considered "empty" templates
+            _ => {}
         }
 
         Ok(issues)
@@ -57,7 +63,7 @@ impl Rule for PublicFunctionRule {
         "Component should have at least one public function"
     }
 
-    fn check(&self, _file: &OrbitFile, _file_path: &str) -> Result<Vec<Issue>, String> {
+    fn check(&self, ast: &OrbitAst, _file_path: &str) -> Result<Vec<Issue>, String> {
         let issues = Vec::new();
 
         // This is a placeholder implementation

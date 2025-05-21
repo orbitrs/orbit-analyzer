@@ -2,73 +2,44 @@
 
 use crate::AnalyzerError;
 use crate::Result;
-use orbit::parser::OrbitFile;
+use orbit::parser::{OrbitAst, OrbitParser};
+use std::path::Path;
+use std::fs;
 
 /// Parse an .orbit file
-pub fn parse_orbit_file(content: &str, file_path: &str) -> Result<OrbitFile> {
-    orbit::parser::OrbitParser::parse_file(content, file_path)
+pub fn parse_orbit_file(content: &str, file_path: &str) -> Result<OrbitAst> {
+    OrbitParser::parse(content)
         .map_err(|e| AnalyzerError::Parser(e.to_string()))
 }
 
 /// Extract component name from an .orbit file
 #[allow(dead_code)]
-pub fn extract_component_name(file: &OrbitFile) -> Option<String> {
-    // Look for a struct definition in the script section
-    for line in file.script.lines() {
-        let line = line.trim();
-        if line.starts_with("pub struct ") {
-            // Extract the struct name
-            let struct_name = line
-                .strip_prefix("pub struct ")?
-                .split_whitespace()
-                .next()?
-                .trim_end_matches('{')
-                .trim();
-
-            return Some(struct_name.to_string());
-        }
+pub fn extract_component_name(ast: &OrbitAst) -> Option<String> {
+    // Get component name from script node
+    if !ast.script.component_name.is_empty() {
+        return Some(ast.script.component_name.clone());
     }
-
+    
     None
 }
 
 /// Parse a component's properties
 #[allow(dead_code)]
-pub fn parse_component_props(file: &OrbitFile) -> Result<Vec<PropInfo>> {
+pub fn parse_component_props(ast: &OrbitAst) -> Result<Vec<PropInfo>> {
+    // In the orbit crate's current implementation, we can directly access the props from the AST
     let mut props = Vec::new();
-
-    // Look for the props struct definition in the script section
-    let mut in_props_struct = false;
-    let mut braces_level = 0;
-
-    for line in file.script.lines() {
-        let line = line.trim();
-
-        // Find the props struct
-        if !in_props_struct && line.contains("pub struct ") && line.contains("Props") {
-            in_props_struct = true;
-            braces_level = line.chars().filter(|c| *c == '{').count() as i32;
-            continue;
-        }
-
-        // If we're in the props struct, extract the props
-        if in_props_struct {
-            braces_level += line.chars().filter(|c| *c == '{').count() as i32;
-            braces_level -= line.chars().filter(|c| *c == '}').count() as i32;
-
-            // End of props struct
-            if braces_level <= 0 {
-                break;
-            }
-
-            // Parse property definition
-            if line.starts_with("pub ") {
-                if let Some(prop_info) = parse_prop_line(line) {
-                    props.push(prop_info);
-                }
-            }
-        }
+    
+    // Convert the props from the AST to our PropInfo format
+    for prop in &ast.script.props {
+        props.push(PropInfo {
+            name: prop.name.clone(),
+            type_name: prop.ty.clone(),
+            required: prop.required,
+            doc: None, // AST doesn't currently store doc comments
+        });
     }
+    
+    // Return the collected properties
 
     Ok(props)
 }
