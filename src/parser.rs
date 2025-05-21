@@ -2,7 +2,7 @@
 
 use crate::AnalyzerError;
 use crate::Result;
-use orbit::parser::{OrbitAst, OrbitParser};
+use orbitrs::parser::{OrbitAst, OrbitParser};
 
 /// Parse an .orbit file
 pub fn parse_orbit_file(content: &str, _file_path: &str) -> Result<OrbitAst> {
