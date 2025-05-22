@@ -44,8 +44,6 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-        with:
-          fetch-depth: 0
       
       - name: Get version
         id: version
@@ -61,20 +59,33 @@ jobs:
     name: Publish to crates.io
     runs-on: ubuntu-latest
     needs: prepare
+    timeout-minutes: 20
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish-crate || github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+        
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+      
+      - name: Verify crate before publishing
+        run: cargo package --no-verify
+        continue-on-error: false
       
       - name: Publish to crates.io
         run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_TOKEN }}
         
   docs:
     name: Build & Publish Docs
     runs-on: ubuntu-latest
     needs: prepare
+    timeout-minutes: 30
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.build-docs || github.event_name == 'push' }}
     steps:
       - name: Create workspace directory
@@ -99,6 +110,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
       
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            orbitrs-workspace/orbit-analyzer -> target
+            
       - name: Build documentation
         working-directory: orbitrs-workspace/orbit-analyzer
         run: cargo doc --no-deps --document-private-items
@@ -113,6 +130,7 @@ jobs:
     name: Build Artifacts
     runs-on: ${{ matrix.os }}
     needs: prepare
+    timeout-minutes: 60
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.cross-platform-artifacts || github.event_name == 'push' }}
     strategy:
       matrix:
@@ -132,6 +150,7 @@ jobs:
           - os: macos-latest
             target: aarch64-apple-darwin
             name: macos-arm64
+      fail-fast: false
     steps:
       - name: Create workspace directory
         run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
@@ -163,6 +182,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+          
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            orbitrs-workspace/orbit-analyzer -> target
+          key: ${{ matrix.target }}
       
       - name: Build for ${{ matrix.name }} (native target)
         if: (!contains(matrix.target, 'aarch64') || contains(matrix.os, 'macos'))

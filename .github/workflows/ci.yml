@@ -120,3 +120,195 @@ jobs:
       - name: Run tests
         working-directory: orbitrs-workspace/orbit-analyzer
         run: cargo test --all-features
+        
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - name: Create workspace directory
+        run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
+      
+      - name: Checkout orbit-analyzer
+        uses: actions/checkout@v4
+        with:
+          path: orbitrs-workspace/orbit-analyzer
+      
+      - name: Checkout orbitrs
+        uses: actions/checkout@v4
+        with:
+          repository: orbitrs/orbitrs
+          path: orbitrs-workspace/orbitrs
+      
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+      
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+      
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            orbitrs-workspace/orbit-analyzer -> target
+      
+      - name: Generate code coverage
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: cargo llvm-cov --all-features --lcov --output-path lcov.info
+      
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: orbitrs-workspace/orbit-analyzer/lcov.info
+          fail_ci_if_error: false
+  
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    needs: check
+    timeout-minutes: 15
+    steps:
+      - name: Create workspace directory
+        run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
+      
+      - name: Checkout orbit-analyzer
+        uses: actions/checkout@v4
+        with:
+          path: orbitrs-workspace/orbit-analyzer
+      
+      - name: Install cargo-audit
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
+      
+      - name: Run security audit
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: cargo audit
+        
+  outdated-dependencies:
+    name: Check Outdated Dependencies
+    runs-on: ubuntu-latest
+    needs: check
+    timeout-minutes: 15
+    steps:
+      - name: Create workspace directory
+        run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
+      
+      - name: Checkout orbit-analyzer
+        uses: actions/checkout@v4
+        with:
+          path: orbitrs-workspace/orbit-analyzer
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Install cargo-outdated
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-outdated
+      
+      - name: Check for outdated dependencies
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: cargo outdated --exit-code 0
+        
+  benchmark:
+    name: Run Benchmarks
+    runs-on: ubuntu-latest
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    timeout-minutes: 30
+    steps:
+      - name: Create workspace directory
+        run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
+      
+      - name: Checkout orbit-analyzer
+        uses: actions/checkout@v4
+        with:
+          path: orbitrs-workspace/orbit-analyzer
+      
+      - name: Checkout orbitrs
+        uses: actions/checkout@v4
+        with:
+          repository: orbitrs/orbitrs
+          path: orbitrs-workspace/orbitrs
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            orbitrs-workspace/orbit-analyzer -> target
+      
+      - name: Install cargo-criterion
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-criterion
+      
+      - name: Run benchmarks
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: |
+          # Create benchmarks directory if it doesn't exist
+          mkdir -p benches
+          
+          # Create a simple benchmark file if it doesn't exist
+          if [ ! -f benches/basic.rs ]; then
+            cat > benches/basic.rs << 'EOF'
+            use criterion::{criterion_group, criterion_main, Criterion};
+            
+            fn parse_benchmark(c: &mut Criterion) {
+                c.bench_function("parse orbit file", |b| {
+                    b.iter(|| {
+                        let content = r#"
+            <template>
+              <div>{{ label }}</div>
+            </template>
+            <script>
+            component Button {
+              props {
+                label: string;
+              }
+            }
+            </script>
+            <style>
+            .button {}
+            </style>
+            "#;
+                        orbit_analyzer::parser::parse_orbit_file(content, "Button.orbit").unwrap()
+                    });
+                });
+            }
+            
+            criterion_group!(benches, parse_benchmark);
+            criterion_main!(benches);
+            EOF
+          fi
+          
+          # Add criterion dependency if it doesn't exist
+          if ! grep -q "criterion" Cargo.toml; then
+            echo -e "\n[dev-dependencies]\ncriterion = \"0.5\"" >> Cargo.toml
+          fi
+          
+          # Run the benchmarks
+          cargo criterion --output-format=quiet
+      
+      - name: Store benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: orbitrs-workspace/orbit-analyzer/target/criterion

@@ -46,7 +46,7 @@ pub fn parse_orbit_file(content: &str, file_path: &str) -> Result<OrbitAst> {
 
                 // For these test files, analyze the filename as a fallback
                 if component_name == "MockComponent" && file_path.contains("/") {
-                    if let Some(filename) = file_path.split('/').last() {
+                    if let Some(filename) = file_path.split('/').next_back() {
                         if let Some(basename) = filename.split('.').next() {
                             component_name = basename.to_string();
                         }
@@ -240,7 +240,7 @@ pub fn extract_component_name(ast: &OrbitAst) -> Option<String> {
 #[allow(dead_code)]
 pub fn parse_component_props(ast: &OrbitAst) -> Result<Vec<PropInfo>> {
     // In the orbit crate's current implementation, we can directly access the props from the AST
-    let mut props = Vec::new();
+    let mut props = vec![];
 
     // Convert the props from the AST to our PropInfo format
     for prop in &ast.script.props {

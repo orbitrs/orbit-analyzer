@@ -23,7 +23,7 @@ impl Linter {
     /// Create a new linter with the given configuration
     pub fn with_config(config: Config) -> Self {
         let mut linter = Self {
-            rules: Vec::new(),
+            rules: vec![],
             config,
         };
 
@@ -61,7 +61,7 @@ impl Linter {
             // For test_bad_component test, manually create issues for each rule
             use crate::reporter::Severity;
 
-            let mut issues = Vec::new();
+            let mut issues = vec![];
 
             // Create the expected issues for BadComponent.orbit
             issues.push(Issue {
@@ -112,7 +112,7 @@ impl Linter {
             use crate::reporter::Severity;
 
             // For test_renderer_specific_component test
-            let mut issues = Vec::new();
+            let mut issues = vec![];
 
             // If renderer is skia, add an issue
             if self.config.renderer_analysis.default_renderer == "skia" {
@@ -132,7 +132,7 @@ impl Linter {
         // Normal behavior for other files
         let orbit_file = parser::parse_orbit_file(content, file_path)?;
 
-        let mut issues = Vec::new();
+        let mut issues = vec![];
 
         for rule in &self.rules {
             let rule_issues = rule
@@ -172,7 +172,7 @@ impl Linter {
             issues.map(|v| v.into_iter().flatten().collect())
         } else {
             // Sequential linting
-            let mut all_issues = Vec::new();
+            let mut all_issues = vec![];
             for file_path in file_paths {
                 let content = std::fs::read_to_string(file_path)?;
                 let issues =
