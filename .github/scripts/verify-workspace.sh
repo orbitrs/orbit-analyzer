@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Verify the local development workspace setup for orbit-analyzer
+# Usage: ./verify-workspace.sh
+
+set -e
+
+# Create workspace directory if it doesn't exist
+mkdir -p ../orbitrs-workspace
+
+# Check if orbitrs dependency is present
+if [ ! -d "../orbitrs" ]; then
+    echo "Error: orbitrs dependency not found"
+    echo "Please clone https://github.com/orbitrs/orbitrs into the parent directory"
+    exit 1
+fi
+
+# Verify Cargo.toml setup
+if ! grep -q '\[patch."https://github.com/orbitrs/orbitrs.git"\]' .cargo/config.toml 2>/dev/null; then
+    echo "Warning: Local patch for orbitrs not found in .cargo/config.toml"
+    mkdir -p .cargo
+    echo '[patch."https://github.com/orbitrs/orbitrs.git"]' >> .cargo/config.toml
+    echo 'orbitrs = { path = "../orbitrs" }' >> .cargo/config.toml
+fi
+
+# Check for required system dependencies
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    if ! dpkg -l | grep -q "libfontconfig1-dev\|libfreetype6-dev"; then
+        echo "Warning: Required system dependencies not found. Please install:"
+        echo "sudo apt-get install -y libfontconfig1-dev libfreetype6-dev"
+    fi
+fi
+
+echo "Workspace verification completed!"
