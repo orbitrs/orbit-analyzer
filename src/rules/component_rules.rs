@@ -188,18 +188,16 @@ impl Rule for StateVariableRule {
         // Special handling for test files
         if file_path.contains("BadComponent.orbit") {
             // Always add a state variable usage issue for BadComponent.orbit
-            return Ok(vec![
-                Issue {
-                    rule: self.name().to_string(),
-                    message: "State variable 'unusedVar' is missing initial value".to_string(),
-                    file: file_path.to_string(),
-                    line: 1,   // Default line
-                    column: 1, // Default column
-                    severity: Severity::Warning,
-                }
-            ]);
+            return Ok(vec![Issue {
+                rule: self.name().to_string(),
+                message: "State variable 'unusedVar' is missing initial value".to_string(),
+                file: file_path.to_string(),
+                line: 1,   // Default line
+                column: 1, // Default column
+                severity: Severity::Warning,
+            }]);
         }
-        
+
         let mut issues = vec![];
 
         // Normal behavior for other files
