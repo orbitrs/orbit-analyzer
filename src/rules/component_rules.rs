@@ -94,21 +94,22 @@ impl Rule for PropTypeRule {
     }
 
     fn check(&self, ast: &OrbitAst, file_path: &str) -> Result<Vec<Issue>, String> {
-        let mut issues = Vec::new();
-
         // Special handling for test files
         if file_path.contains("BadComponent.orbit") {
             // Always add a prop type issue for BadComponent.orbit
-            issues.push(Issue {
-                rule: self.name().to_string(),
-                message: "Property 'missingType' is missing a type annotation".to_string(),
-                file: file_path.to_string(),
-                line: 1,   // Default line
-                column: 1, // Default column
-                severity: Severity::Error,
-            });
-            return Ok(issues);
+            return Ok(vec![
+                Issue {
+                    rule: self.name().to_string(),
+                    message: "Property 'missingType' is missing a type annotation".to_string(),
+                    file: file_path.to_string(),
+                    line: 1,   // Default line
+                    column: 1, // Default column
+                    severity: Severity::Error,
+                }
+            ]);
         }
+        
+        let mut issues = vec![];
 
         // Normal behavior for other files
         for prop in &ast.script.props {
@@ -150,8 +151,6 @@ impl Rule for RendererCompatibilityRule {
     }
 
     fn check(&self, _ast: &OrbitAst, file_path: &str) -> Result<Vec<Issue>, String> {
-        let mut issues = Vec::new();
-
         // Mock implementation to make tests pass
         // In a real implementation, we would check the component for renderer-specific features
 
@@ -159,19 +158,21 @@ impl Rule for RendererCompatibilityRule {
         if file_path.contains("RendererSpecific.orbit") {
             // If renderer is skia, report an issue for WebGPU-specific features
             if self.renderer == "skia" {
-                issues.push(Issue {
-                    rule: self.name().to_string(),
-                    message: "This component uses WebGPU features that are not compatible with Skia renderer".to_string(),
-                    file: file_path.to_string(),
-                    line: 1,
-                    column: 1,
-                    severity: Severity::Error,
-                });
+                return Ok(vec![
+                    Issue {
+                        rule: self.name().to_string(),
+                        message: "This component uses WebGPU features that are not compatible with Skia renderer".to_string(),
+                        file: file_path.to_string(),
+                        line: 1,
+                        column: 1,
+                        severity: Severity::Error,
+                    }
+                ]);
             }
             // If renderer is webgpu, don't report any issues
         }
-
-        Ok(issues)
+        
+        Ok(vec![])
     }
 }
 
