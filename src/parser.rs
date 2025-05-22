@@ -342,7 +342,7 @@ component MockComponent {
                     // Override the component name from the mock
                     ast.script.component_name = mock.component_name.clone();
                     ast
-                },
+                }
                 Err(e) => panic!(
                     "Failed to create mock AST - this should never happen: {}",
                     e
