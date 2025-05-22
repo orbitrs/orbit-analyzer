@@ -141,46 +141,42 @@ jobs:
         run: |
           # Add a build.rs file to ensure proper linking of Windows libraries if it doesn't exist
           if [ ! -f "build.rs" ]; then
-            cat > build.rs << 'EOLBUILD'
-            // This build script ensures that advapi32.lib is properly linked on Windows
-            // which is needed by the Skia ICU library for Registry API functions
-
-            fn main() {
-                // Only add Windows-specific linking on Windows MSVC target
-                #[cfg(all(target_os = "windows", target_env = "msvc"))]
-                {
-                    // Link advapi32.lib which contains the Windows Registry API
-                    println!("cargo:rustc-link-lib=dylib=advapi32");
-                    
-                    // Ensure the linker can find the library
-                    println!("cargo:rustc-link-search=native=C:\\Windows\\System32");
-                }
-            }
-            EOLBUILD
+            echo '// This build script ensures that advapi32.lib is properly linked on Windows' > build.rs
+            echo '// which is needed by the Skia ICU library for Registry API functions' >> build.rs
+            echo '' >> build.rs
+            echo 'fn main() {' >> build.rs
+            echo '    // Only add Windows-specific linking on Windows MSVC target' >> build.rs
+            echo '    #[cfg(all(target_os = "windows", target_env = "msvc"))]' >> build.rs
+            echo '    {' >> build.rs
+            echo '        // Link advapi32.lib which contains the Windows Registry API' >> build.rs
+            echo '        println!("cargo:rustc-link-lib=dylib=advapi32");' >> build.rs
+            echo '        ' >> build.rs
+            echo '        // Ensure the linker can find the library' >> build.rs
+            echo '        println!("cargo:rustc-link-search=native=C:\\Windows\\System32");' >> build.rs
+            echo '    }' >> build.rs
+            echo '}' >> build.rs
           fi
           
           # Create a Windows helper batch file
           mkdir -p scripts
-          cat > scripts/windows-setup.bat << 'EOLBAT'
-          @echo off
-          REM Helper script to ensure proper linking of Windows libraries
-          REM This addresses the missing advapi32.lib issue with Skia ICU
-
-          echo Setting up Windows build environment for OrbitRS...
-
-          REM Ensure advapi32.lib is linked
-          echo Adding advapi32.lib to link libraries
-
-          REM Display environment for debugging
-          echo Windows SDK Dir: %WindowsSdkDir%
-          echo Windows SDK Version: %WindowsSDKVersion%
-
-          REM Add Windows SDK libs to the LIB environment variable
-          set "LIB=%LIB%;%WindowsSdkDir%\Lib\%WindowsSDKVersion%\um\x64"
-          echo Updated LIB environment variable
-
-          exit /b 0
-          EOLBAT
+          echo '@echo off' > scripts/windows-setup.bat
+          echo 'REM Helper script to ensure proper linking of Windows libraries' >> scripts/windows-setup.bat
+          echo 'REM This addresses the missing advapi32.lib issue with Skia ICU' >> scripts/windows-setup.bat
+          echo '' >> scripts/windows-setup.bat
+          echo 'echo Setting up Windows build environment for OrbitRS...' >> scripts/windows-setup.bat
+          echo '' >> scripts/windows-setup.bat
+          echo 'REM Ensure advapi32.lib is linked' >> scripts/windows-setup.bat
+          echo 'echo Adding advapi32.lib to link libraries' >> scripts/windows-setup.bat
+          echo '' >> scripts/windows-setup.bat
+          echo 'REM Display environment for debugging' >> scripts/windows-setup.bat
+          echo 'echo Windows SDK Dir: %WindowsSdkDir%' >> scripts/windows-setup.bat
+          echo 'echo Windows SDK Version: %WindowsSDKVersion%' >> scripts/windows-setup.bat
+          echo '' >> scripts/windows-setup.bat
+          echo 'REM Add Windows SDK libs to the LIB environment variable' >> scripts/windows-setup.bat
+          echo 'set "LIB=%LIB%;%WindowsSdkDir%\Lib\%WindowsSDKVersion%\um\x64"' >> scripts/windows-setup.bat
+          echo 'echo Updated LIB environment variable' >> scripts/windows-setup.bat
+          echo '' >> scripts/windows-setup.bat
+          echo 'exit /b 0' >> scripts/windows-setup.bat
           
           # Create .cargo/config.toml with correct Windows linker settings in the dependency repo too
           mkdir -p orbitrs_dep/.cargo
@@ -188,24 +184,22 @@ jobs:
           echo 'rustflags = ["-C", "link-arg=/DEFAULTLIB:advapi32.lib"]' >> orbitrs_dep/.cargo/config.toml
           
           # Create build.rs for orbitrs dependency as well
-          cat > orbitrs_dep/build.rs << 'EOLDEP'
-          // This build script ensures all required libraries are properly linked
-          // It's particularly important for Windows where advapi32.lib is needed for the Skia ICU library
-
-          fn main() {
-              // Windows-specific linking for MSVC target
-              #[cfg(all(target_os = "windows", target_env = "msvc"))]
-              {
-                  // Link advapi32.lib which contains the Windows Registry API
-                  println!("cargo:rustc-link-lib=dylib=advapi32");
-                  
-                  // Ensure the linker can find the library
-                  println!("cargo:rustc-link-search=native=C:\\Windows\\System32");
-              }
-              
-              // Add any future platform-specific dependencies here
-          }
-          EOLDEP
+          echo '// This build script ensures all required libraries are properly linked' > orbitrs_dep/build.rs
+          echo '// It is particularly important for Windows where advapi32.lib is needed for the Skia ICU library' >> orbitrs_dep/build.rs
+          echo '' >> orbitrs_dep/build.rs
+          echo 'fn main() {' >> orbitrs_dep/build.rs
+          echo '    // Windows-specific linking for MSVC target' >> orbitrs_dep/build.rs
+          echo '    #[cfg(all(target_os = "windows", target_env = "msvc"))]' >> orbitrs_dep/build.rs
+          echo '    {' >> orbitrs_dep/build.rs
+          echo '        // Link advapi32.lib which contains the Windows Registry API' >> orbitrs_dep/build.rs
+          echo '        println!("cargo:rustc-link-lib=dylib=advapi32");' >> orbitrs_dep/build.rs
+          echo '        ' >> orbitrs_dep/build.rs
+          echo '        // Ensure the linker can find the library' >> orbitrs_dep/build.rs
+          echo '        println!("cargo:rustc-link-search=native=C:\\\\Windows\\\\System32");' >> orbitrs_dep/build.rs
+          echo '    }' >> orbitrs_dep/build.rs
+          echo '    ' >> orbitrs_dep/build.rs
+          echo '    // Add any future platform-specific dependencies here' >> orbitrs_dep/build.rs
+          echo '}' >> orbitrs_dep/build.rs
         shell: bash
       
       # Configure Windows dependencies to address the Registry API issue
