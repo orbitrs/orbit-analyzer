@@ -22,19 +22,25 @@ jobs:
     name: Format & Lint
     runs-on: ubuntu-latest
     steps:
-      # Check out the entire monorepo
-      - name: Checkout orbitrs monorepo
+      # Check out the repository
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
-          path: orbitrs
-
+          
       # Set up cargo workspace links
       - name: Set up workspace
         run: |
-          mkdir -p orbitrs/orbit-analyzer/.cargo
-          echo '[patch.crates-io]' > orbitrs/orbit-analyzer/.cargo/config.toml
-          echo 'orbitrs = { path = "../orbitrs" }' >> orbitrs/orbit-analyzer/.cargo/config.toml
+          mkdir -p .cargo
+          echo '[patch.crates-io]' > .cargo/config.toml
+          echo 'orbitrs = { path = "../orbitrs" }' >> .cargo/config.toml
+          
+      # Clone the orbitrs dependency
+      - name: Clone orbitrs dependency
+        uses: actions/checkout@v3
+        with:
+          repository: orbitrs/orbitrs
+          path: ../orbitrs
           
       - name: Install system dependencies
         run: |
@@ -57,21 +63,19 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            orbitrs/orbit-analyzer/target/
-          key: \${{ runner.os }}-cargo-\${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: \${{ runner.os }}-cargo-
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
             
       - name: Check code formatting
-        working-directory: orbitrs/orbit-analyzer
         run: cargo fmt --all -- --check
         
       - name: Run clippy
-        working-directory: orbitrs/orbit-analyzer
         run: cargo clippy --all-targets --all-features -- -D warnings
         
   test:
     name: Test
-    runs-on: \${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     needs: check
     timeout-minutes: 45
     strategy:
@@ -85,19 +89,25 @@ jobs:
             target: x86_64-apple-darwin
       fail-fast: false
     steps:
-      - name: Checkout orbitrs monorepo
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
-          path: orbitrs
       
       # Set up cargo workspace links
       - name: Set up workspace
         run: |
-          mkdir -p orbitrs/orbit-analyzer/.cargo
-          echo '[patch.crates-io]' > orbitrs/orbit-analyzer/.cargo/config.toml
-          echo 'orbitrs = { path = "../orbitrs" }' >> orbitrs/orbit-analyzer/.cargo/config.toml
+          mkdir -p .cargo
+          echo '[patch.crates-io]' > .cargo/config.toml
+          echo 'orbitrs = { path = "../orbitrs" }' >> .cargo/config.toml
         shell: bash
+        
+      # Clone the orbitrs dependency
+      - name: Clone orbitrs dependency
+        uses: actions/checkout@v3
+        with:
+          repository: orbitrs/orbitrs
+          path: ../orbitrs
       
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
@@ -105,7 +115,7 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-          target: \${{ matrix.target }}
+          target: ${{ matrix.target }}
       
       - name: Install system dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
@@ -121,21 +131,20 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            orbitrs/orbit-analyzer/target/
-          key: \${{ runner.os }}-cargo-\${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: \${{ runner.os }}-cargo-
+            target/
+          key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
       
       # Configure Windows dependencies to address the Registry API issue
       - name: Configure Windows dependencies
         if: matrix.os == 'windows-latest'
         run: |
-          echo '[target.x86_64-pc-windows-msvc]' >> orbitrs/orbit-analyzer/.cargo/config.toml
-          echo 'rustflags = ["-C", "link-arg=advapi32.lib"]' >> orbitrs/orbit-analyzer/.cargo/config.toml
+          echo '[target.x86_64-pc-windows-msvc]' >> .cargo/config.toml
+          echo 'rustflags = ["-C", "link-arg=advapi32.lib"]' >> .cargo/config.toml
         shell: bash
             
       # Fix wayland-backend issue by ignoring unstable features
       - name: Run tests
-        working-directory: orbitrs/orbit-analyzer
         run: RUSTFLAGS="--cfg ignore_wayland_tests" cargo test --all-features
         shell: bash
         
@@ -145,24 +154,29 @@ jobs:
     needs: check
     timeout-minutes: 15
     steps:
-      - name: Checkout orbitrs monorepo
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
-          path: orbitrs
       
       # Set up cargo workspace links
       - name: Set up workspace
         run: |
-          mkdir -p orbitrs/orbit-analyzer/.cargo
-          echo '[patch.crates-io]' > orbitrs/orbit-analyzer/.cargo/config.toml
-          echo 'orbitrs = { path = "../orbitrs" }' >> orbitrs/orbit-analyzer/.cargo/config.toml
+          mkdir -p .cargo
+          echo '[patch.crates-io]' > .cargo/config.toml
+          echo 'orbitrs = { path = "../orbitrs" }' >> .cargo/config.toml
+      
+      # Clone the orbitrs dependency
+      - name: Clone orbitrs dependency
+        uses: actions/checkout@v3
+        with:
+          repository: orbitrs/orbitrs
+          path: ../orbitrs
       
       - name: Install cargo-audit
         run: cargo install cargo-audit
       
       - name: Run security audit
-        working-directory: orbitrs/orbit-analyzer
         run: cargo audit --ignore RUSTSEC-0000-0000 || true
         
   outdated-dependencies:
@@ -171,18 +185,24 @@ jobs:
     needs: check
     timeout-minutes: 15
     steps:
-      - name: Checkout orbitrs monorepo
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
-          path: orbitrs
       
       # Set up cargo workspace links
       - name: Set up workspace
         run: |
-          mkdir -p orbitrs/orbit-analyzer/.cargo
-          echo '[patch.crates-io]' > orbitrs/orbit-analyzer/.cargo/config.toml
-          echo 'orbitrs = { path = "../orbitrs" }' >> orbitrs/orbit-analyzer/.cargo/config.toml
+          mkdir -p .cargo
+          echo '[patch.crates-io]' > .cargo/config.toml
+          echo 'orbitrs = { path = "../orbitrs" }' >> .cargo/config.toml
+      
+      # Clone the orbitrs dependency
+      - name: Clone orbitrs dependency
+        uses: actions/checkout@v3
+        with:
+          repository: orbitrs/orbitrs
+          path: ../orbitrs
       
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
@@ -195,7 +215,6 @@ jobs:
         run: cargo install cargo-outdated
       
       - name: Check for outdated dependencies
-        working-directory: orbitrs/orbit-analyzer
         run: cargo outdated --exit-code 0 || true
         
   benchmark:
@@ -205,18 +224,24 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     timeout-minutes: 30
     steps:
-      - name: Checkout orbitrs monorepo
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
-          path: orbitrs
       
       # Set up cargo workspace links
       - name: Set up workspace
         run: |
-          mkdir -p orbitrs/orbit-analyzer/.cargo
-          echo '[patch.crates-io]' > orbitrs/orbit-analyzer/.cargo/config.toml
-          echo 'orbitrs = { path = "../orbitrs" }' >> orbitrs/orbit-analyzer/.cargo/config.toml
+          mkdir -p .cargo
+          echo '[patch.crates-io]' > .cargo/config.toml
+          echo 'orbitrs = { path = "../orbitrs" }' >> .cargo/config.toml
+      
+      # Clone the orbitrs dependency
+      - name: Clone orbitrs dependency
+        uses: actions/checkout@v3
+        with:
+          repository: orbitrs/orbitrs
+          path: ../orbitrs
       
       - name: Install system dependencies
         run: |
@@ -238,62 +263,51 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            orbitrs/orbit-analyzer/target/
-          key: \${{ runner.os }}-cargo-\${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: \${{ runner.os }}-cargo-
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
       
       - name: Install cargo-criterion
         run: cargo install cargo-criterion
       
       - name: Create benchmark directory
-        working-directory: orbitrs/orbit-analyzer
         run: mkdir -p benches
         shell: bash
       
-      - name: Create benchmark template - part 1
-        working-directory: orbitrs/orbit-analyzer
+      - name: Create benchmark file
         run: |
-          echo 'use criterion::{criterion_group, criterion_main, Criterion};' > benches/basic.rs
-          echo '' >> benches/basic.rs
-          echo 'fn parse_benchmark(c: &mut Criterion) {' >> benches/basic.rs
-          echo '    c.bench_function("parse orbit file", |b| {' >> benches/basic.rs
-          echo '        b.iter(|| {' >> benches/basic.rs
-        shell: bash
-      
-      - name: Create benchmark template - part 2
-        working-directory: orbitrs/orbit-analyzer
-        run: |
-          echo '            let content = r#"' >> benches/basic.rs
-          echo '<template>' >> benches/basic.rs
-          echo '  <div>{{ label }}</div>' >> benches/basic.rs
-          echo '</template>' >> benches/basic.rs
-          echo '<script>' >> benches/basic.rs
-          echo 'component Button {' >> benches/basic.rs
-          echo '  props {' >> benches/basic.rs
-          echo '    label: string;' >> benches/basic.rs
-          echo '  }' >> benches/basic.rs
-          echo '}' >> benches/basic.rs
-          echo '</script>' >> benches/basic.rs
-          echo '<style>' >> benches/basic.rs
-          echo '.button {}' >> benches/basic.rs
-          echo '</style>' >> benches/basic.rs
-          echo '"#;' >> benches/basic.rs
-        shell: bash
-      
-      - name: Create benchmark template - part 3
-        working-directory: orbitrs/orbit-analyzer
-        run: |
-          echo '            orbit_analyzer::parser::parse_orbit_file(content, "Button.orbit").unwrap()' >> benches/basic.rs
-          echo '        });' >> benches/basic.rs
-          echo '    });' >> benches/basic.rs
-          echo '}' >> benches/basic.rs
-          echo '' >> benches/basic.rs
-          echo 'criterion_group!(benches, parse_benchmark);' >> benches/basic.rs
-          echo 'criterion_main!(benches);' >> benches/basic.rs
+          cat > benches/basic.rs << 'EOL'
+          use criterion::{criterion_group, criterion_main, Criterion};
+
+          fn parse_benchmark(c: &mut Criterion) {
+              c.bench_function("parse orbit file", |b| {
+                  b.iter(|| {
+                      let content = r#"
+          <template>
+            <div>{{ label }}</div>
+          </template>
+          <script>
+          component Button {
+            props {
+              label: string;
+            }
+          }
+          </script>
+          <style>
+          .button {}
+          </style>
+          "#;
+                      orbit_analyzer::parser::parse_orbit_file(content, "Button.orbit").unwrap()
+                  });
+              });
+          }
+
+          criterion_group!(benches, parse_benchmark);
+          criterion_main!(benches);
+          EOL
         shell: bash
       
       - name: Add criterion dependency
-        working-directory: orbitrs/orbit-analyzer
         run: |
           if ! grep -q "criterion" Cargo.toml; then
             echo -e "\n[dev-dependencies]\ncriterion = \"0.5\"" >> Cargo.toml
@@ -301,7 +315,6 @@ jobs:
         shell: bash
       
       - name: Run benchmarks
-        working-directory: orbitrs/orbit-analyzer
         run: cargo criterion --output-format=quiet || true
         shell: bash
       
@@ -309,4 +322,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: benchmark-results
-          path: orbitrs/orbit-analyzer/target/criterion
+          path: target/criterion
