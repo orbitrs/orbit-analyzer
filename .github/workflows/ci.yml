@@ -154,7 +154,7 @@ jobs:
       # Run tests from workspace root but only for orlint
       - name: Run tests
         working-directory: orbitrs-workspace
-        run: RUSTFLAGS="--cfg ignore_wayland_tests" cargo test --package orlint --target ${{ matrix.target }} --all-features
+        run: RUSTFLAGS="--cfg ignore_wayland_tests" cargo test --package orlint --target ${{ matrix.target }} --all-features --verbose
         shell: bash
         
   security-audit:
