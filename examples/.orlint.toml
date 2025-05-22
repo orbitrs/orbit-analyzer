@@ -1,0 +1,36 @@
+# Example configuration for orlint
+# This is used by the test_load_config test in config_tests.rs
+
+# Analyzer settings
+[analyzer]
+parallel = true
+include_patterns = ["**/*.orbit", "**/*.orb"]
+exclude_patterns = ["**/node_modules/**", "**/target/**"]
+
+# Renderer-specific analysis
+[renderer_analysis]
+enabled = true
+default_renderer = "skia"
+inline_styles = true
+
+# Rule configuration
+[rules]
+# Default severity level for all rules
+default_severity = "warning"
+
+# Individual rule configurations
+[rules.component-naming]
+enabled = true
+severity = "warning"
+
+[rules.prop-type-required]
+enabled = true
+severity = "warning"
+
+[rules.non-empty-template]
+enabled = true
+severity = "error"
+
+[rules.public-function]
+enabled = true
+severity = "info"
