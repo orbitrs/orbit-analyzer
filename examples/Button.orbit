@@ -8,23 +8,31 @@
 
 <code lang="rust">
 component Button {
-  // Props with type annotations and default values
+  // Props with type annotations
   props {
-    label: string = "Click Me";
-    isPrimary: boolean = true;
-    isDisabled: boolean = false;
-    onClick: () => void = () => {};
+    label: string;
+    isPrimary: boolean;
+    isDisabled: boolean;
+    onClick: () => void;
   }
 
   // State variables with type annotations
   state {
-    clickCount: number = 0;
-    lastClickTime: number | null = null;
+    clickCount: number;
+    lastClickTime: number | null;
   }
 
   // Component lifecycle method
   mounted() {
     console.log("Button component mounted");
+    this.clickCount = 0;
+    this.lastClickTime = null;
+    
+    // Set default values for props if needed
+    if (this.label === undefined) this.label = "Click Me";
+    if (this.isPrimary === undefined) this.isPrimary = true;
+    if (this.isDisabled === undefined) this.isDisabled = false;
+    if (this.onClick === undefined) this.onClick = () => {};
   }
 
   // Event handler with proper typing
