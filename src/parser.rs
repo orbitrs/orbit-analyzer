@@ -140,46 +140,48 @@ component Button {
 }
 </style>
 "#;
-            // Don't even try to parse with OrbitParser since it doesn't support the Equal token yet
-            // Instead, create a minimal valid AST manually with the necessary structure for the tests
-            let mut ast = OrbitAst::new(
-                // Simple template node
-                ast::TemplateNode::Element {
-                    tag: "div".to_string(),
-                    attributes: std::collections::HashMap::new(),
-                    events: std::collections::HashMap::new(),
-                    children: vec![ast::TemplateNode::Expression("label".to_string())],
-                },
-                // Empty style node
-                ast::StyleNode {
-                    rules: vec![],
-                    scoped: true,
-                },
-                // Script node with component data
-                ast::ScriptNode {
-                    imports: vec![],
-                    component_name: "Button".to_string(),
-                    props: vec![
-                        ast::PropDefinition {
-                            name: "label".to_string(),
-                            ty: "string".to_string(),
-                            required: false,
-                            default: Some("Click Me".to_string()),
-                        },
-                        ast::PropDefinition {
-                            name: "isPrimary".to_string(),
-                            ty: "boolean".to_string(),
-                            required: false,
-                            default: Some("true".to_string()),
-                        },
-                    ],
-                    state: vec![],
-                    methods: vec![],
-                    lifecycle: vec![],
-                },
-            );
-            
-            ast
+            // For the good component test - use a simplified version without equal signs
+            let component_content = r#"
+<template>
+  <div>{{ label }}</div>
+</template>
+
+<script>
+component Button {
+  props {
+    label: string;
+    isPrimary: boolean;
+  }
+  
+  state {
+    clickCount: number;
+  }
+  
+  handleClick() {
+    if (this.isDisabled) {
+      return;
+    }
+    
+    this.clickCount += 1;
+    this.onClick();
+  }
+  
+  getClickCount() {
+    return this.clickCount;
+  }
+}
+</script>
+
+<style>
+.button-container {
+  display: flex;
+}
+</style>
+"#;
+            match OrbitParser::parse(component_content) {
+                Ok(ast) => ast,
+                Err(_) => panic!("Failed to create mock AST for Button.orbit"),
+            }
         } else if mock.file_path.contains("BadComponent.orbit") {
             // For BadComponent.orbit, instead of trying to parse problematic content,
             // let's just return a custom AST with all the expected issues
@@ -207,40 +209,33 @@ component BadComponent {
 .BadComponent {}
 </style>
 "#;
-            // Don't even try to parse with OrbitParser since it doesn't support the Equal token yet
-            // Create a direct mock AST for BadComponent to ensure tests pass
-            let mut ast = OrbitAst::new(
-                // Simple template node 
-                ast::TemplateNode::Element {
-                    tag: "div".to_string(),
-                    attributes: std::collections::HashMap::new(),
-                    events: std::collections::HashMap::new(),
-                    children: vec![],
-                },
-                // Empty style node
-                ast::StyleNode {
-                    rules: vec![],
-                    scoped: true,
-                },
-                // Script node with component data - using lowercase name to trigger error
-                ast::ScriptNode {
-                    imports: vec![],
-                    component_name: "badComponent".to_string(), // lowercase to trigger rule error
-                    props: vec![
-                        ast::PropDefinition {
-                            name: "name".to_string(),
-                            ty: "string".to_string(),
-                            required: true,
-                            default: None,
-                        },
-                    ],
-                    state: vec![],
-                    methods: vec![],
-                    lifecycle: vec![],
-                },
-            );
-            
-            ast
+            // For BadComponent.orbit, create a simplified component that will trigger the rule
+            let component_content = r#"
+<template>
+  <div></div>
+</template>
+
+<script>
+component badComponent {
+  props {
+    name: string;
+  }
+  
+  state {
+    count: number;
+  }
+}
+</script>
+
+<style>
+.BadComponent {}
+</style>
+"#;
+            // Parse the valid component
+            match OrbitParser::parse(component_content) {
+                Ok(ast) => ast,
+                Err(e) => panic!("Failed to create mock AST for BadComponent.orbit: {}", e),
+            }
         } else if mock.file_path.contains("RendererSpecific.orbit") {
             // For the renderer-specific component test with WebGPU features
             // that are incompatible with Skia
@@ -266,56 +261,36 @@ component RendererSpecific {
 .webgpu-feature {}
 </style>
 "#;
-            // Create direct AST for RendererSpecific
-            let mut ast = OrbitAst::new(
-                // Template node with WebGPU specific attribute
-                ast::TemplateNode::Element {
-                    tag: "div".to_string(),
-                    attributes: {
-                        let mut map = std::collections::HashMap::new();
-                        map.insert("webgpu".to_string(), ast::AttributeValue::Static("shader".to_string()));
-                        map
-                    },
-                    events: std::collections::HashMap::new(),
-                    children: vec![],
-                },
-                // Style node with webgpu-feature class
-                ast::StyleNode {
-                    rules: vec![
-                        ast::StyleRule {
-                            selector: ".webgpu-feature".to_string(),
-                            declarations: std::collections::HashMap::new(),
-                        },
-                    ],
-                    scoped: true,
-                },
-                // Script node with renderer-specific component
-                ast::ScriptNode {
-                    imports: vec![],
-                    component_name: "RendererSpecific".to_string(),
-                    props: vec![
-                        ast::PropDefinition {
-                            name: "renderMode".to_string(),
-                            ty: "string".to_string(),
-                            required: true,
-                            default: None,
-                        },
-                    ],
-                    state: vec![],
-                    methods: vec![
-                        ast::MethodDefinition {
-                            name: "startRender".to_string(),
-                            params: vec![],
-                            return_type: Some("boolean".to_string()),
-                            body: "return true;".to_string(),
-                            is_public: true,
-                        },
-                    ],
-                    lifecycle: vec![],
-                },
-            );
-            
-            ast
+            // For the renderer-specific component test with WebGPU features
+            let component_content = r#"
+<template>
+  <div webgpu="shader"></div>
+</template>
+
+<script>
+component RendererSpecific {
+  props {
+    renderMode: string;
+  }
+  
+  // WebGPU specific rendering function
+  startRender() {
+    return true;
+  }
+}
+</script>
+
+<style>
+.webgpu-feature {}
+</style>
+"#;
+            match OrbitParser::parse(component_content) {
+                Ok(ast) => ast,
+                Err(e) => panic!(
+                    "Failed to create mock AST for RendererSpecific.orbit: {}",
+                    e
+                ),
+            }
         } else {
             // Default mock implementation for all other cases
             let minimal_orbit = r#"
@@ -339,53 +314,40 @@ component MockComponent {
 .mock {}
 </style>
 "#;
-            // Create a basic default mock AST
-            let component_name = mock.component_name.clone();
-            let mut ast = OrbitAst::new(
-                // Simple template node
-                ast::TemplateNode::Element {
-                    tag: "div".to_string(),
-                    attributes: std::collections::HashMap::new(),
-                    events: std::collections::HashMap::new(),
-                    children: vec![ast::TemplateNode::Text("Mock Template".to_string())],
+            // Default mock implementation for all other cases
+            let component_content = r#"
+<template>
+  <div>Mock Template</div>
+</template>
+
+<script>
+component MockComponent {
+  props {
+    name: string;
+  }
+  
+  testFunction() {
+    return true;
+  }
+}
+</script>
+
+<style>
+.mock {}
+</style>
+"#;
+            // Use component name from the mock
+            match OrbitParser::parse(component_content) {
+                Ok(mut ast) => {
+                    // Override the component name from the mock
+                    ast.script.component_name = mock.component_name.clone();
+                    ast
                 },
-                // Empty style node
-                ast::StyleNode {
-                    rules: vec![
-                        ast::StyleRule {
-                            selector: ".mock".to_string(),
-                            declarations: std::collections::HashMap::new(),
-                        },
-                    ],
-                    scoped: false,
-                },
-                // Script node with component data
-                ast::ScriptNode {
-                    imports: vec![],
-                    component_name,
-                    props: vec![
-                        ast::PropDefinition {
-                            name: "name".to_string(),
-                            ty: "string".to_string(),
-                            required: true,
-                            default: None,
-                        },
-                    ],
-                    state: vec![],
-                    methods: vec![
-                        ast::MethodDefinition {
-                            name: "testFunction".to_string(),
-                            params: vec![],
-                            return_type: Some("boolean".to_string()),
-                            body: "return true;".to_string(),
-                            is_public: true,
-                        },
-                    ],
-                    lifecycle: vec![],
-                },
-            );
-            
-            ast
+                Err(e) => panic!(
+                    "Failed to create mock AST - this should never happen: {}",
+                    e
+                ),
+            }
         }
     }
 }
