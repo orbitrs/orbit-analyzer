@@ -1,5 +1,10 @@
 # Orbit Analyzer
 
+![CI Status](https://github.com/orbitrs/orbit-analyzer/actions/workflows/ci.yml/badge.svg)
+![Release Status](https://github.com/orbitrs/orbit-analyzer/actions/workflows/release.yml/badge.svg)
+[![codecov](https://codecov.io/gh/orbitrs/orbit-analyzer/branch/main/graph/badge.svg?token=CODECOV_TOKEN)](https://codecov.io/gh/orbitrs/orbit-analyzer)
+[![crates.io](https://img.shields.io/crates/v/orbit-analyzer.svg)](https://crates.io/crates/orbit-analyzer)
+
 ## 📖 Project Overview
 
 **Orbit Analyzer** is a Rust-based static analysis tool designed specifically to parse, analyze, and validate `.orbit` component files. It helps developers maintain code quality, enforce best practices, and catch errors early within the Orbit UI framework ecosystem.
