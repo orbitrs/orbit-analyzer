@@ -96,8 +96,11 @@ impl MockOrbitAst {
     fn create_from_mock(mock: MockAst) -> OrbitAst {
         // Check platform-independent if path contains a specific filename
         let path = std::path::Path::new(&mock.file_path);
-        let is_button = path.file_name().map(|f| f.to_string_lossy().contains("Button.orbit")).unwrap_or(false);
-        
+        let is_button = path
+            .file_name()
+            .map(|f| f.to_string_lossy().contains("Button.orbit"))
+            .unwrap_or(false);
+
         // Special case implementations based on file path to make tests pass
         if is_button {
             // For the good component test - updated to match the actual Button.orbit file format
@@ -174,7 +177,11 @@ component Button {
                 Ok(ast) => ast,
                 Err(_) => panic!("Failed to create mock AST for Button.orbit"),
             }
-        } else if std::path::Path::new(&mock.file_path).file_name().map(|f| f.to_string_lossy().contains("BadComponent.orbit")).unwrap_or(false) {
+        } else if std::path::Path::new(&mock.file_path)
+            .file_name()
+            .map(|f| f.to_string_lossy().contains("BadComponent.orbit"))
+            .unwrap_or(false)
+        {
             // For BadComponent.orbit, instead of trying to parse problematic content,
             // let's just return a custom AST with all the expected issues
 
@@ -228,7 +235,11 @@ component badComponent {
                 Ok(ast) => ast,
                 Err(e) => panic!("Failed to create mock AST for BadComponent.orbit: {}", e),
             }
-        } else if std::path::Path::new(&mock.file_path).file_name().map(|f| f.to_string_lossy().contains("RendererSpecific.orbit")).unwrap_or(false) {
+        } else if std::path::Path::new(&mock.file_path)
+            .file_name()
+            .map(|f| f.to_string_lossy().contains("RendererSpecific.orbit"))
+            .unwrap_or(false)
+        {
             // For the renderer-specific component test with WebGPU features
             // that are incompatible with Skia
             let _renderer_specific = r#"
