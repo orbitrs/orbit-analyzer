@@ -135,18 +135,109 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
       
+      # Prepare Windows build environment
+      - name: Prepare Windows build environment
+        if: matrix.os == 'windows-latest'
+        run: |
+          # Add a build.rs file to ensure proper linking of Windows libraries if it doesn't exist
+          if [ ! -f "build.rs" ]; then
+            cat > build.rs << 'EOL'
+            // This build script ensures that advapi32.lib is properly linked on Windows
+            // which is needed by the Skia ICU library for Registry API functions
+
+            fn main() {
+                // Only add Windows-specific linking on Windows MSVC target
+                #[cfg(all(target_os = "windows", target_env = "msvc"))]
+                {
+                    // Link advapi32.lib which contains the Windows Registry API
+                    println!("cargo:rustc-link-lib=dylib=advapi32");
+                    
+                    // Ensure the linker can find the library
+                    println!("cargo:rustc-link-search=native=C:\\Windows\\System32");
+                }
+            }
+            EOL
+          fi
+          
+          # Create a Windows helper batch file
+          mkdir -p scripts
+          cat > scripts/windows-setup.bat << 'EOL'
+          @echo off
+          REM Helper script to ensure proper linking of Windows libraries
+          REM This addresses the missing advapi32.lib issue with Skia ICU
+
+          echo Setting up Windows build environment for OrbitRS...
+
+          REM Ensure advapi32.lib is linked
+          echo Adding advapi32.lib to link libraries
+
+          REM Display environment for debugging
+          echo Windows SDK Dir: %WindowsSdkDir%
+          echo Windows SDK Version: %WindowsSDKVersion%
+
+          REM Add Windows SDK libs to the LIB environment variable
+          set "LIB=%LIB%;%WindowsSdkDir%\Lib\%WindowsSDKVersion%\um\x64"
+          echo Updated LIB environment variable
+
+          exit /b 0
+          EOL
+          
+          # Create .cargo/config.toml with correct Windows linker settings in the dependency repo too
+          mkdir -p orbitrs_dep/.cargo
+          echo '[target.x86_64-pc-windows-msvc]' > orbitrs_dep/.cargo/config.toml
+          echo 'rustflags = ["-C", "link-arg=/DEFAULTLIB:advapi32.lib"]' >> orbitrs_dep/.cargo/config.toml
+          
+          # Create build.rs for orbitrs dependency as well
+          cat > orbitrs_dep/build.rs << 'EOL'
+          // This build script ensures all required libraries are properly linked
+          // It's particularly important for Windows where advapi32.lib is needed for the Skia ICU library
+
+          fn main() {
+              // Windows-specific linking for MSVC target
+              #[cfg(all(target_os = "windows", target_env = "msvc"))]
+              {
+                  // Link advapi32.lib which contains the Windows Registry API
+                  println!("cargo:rustc-link-lib=dylib=advapi32");
+                  
+                  // Ensure the linker can find the library
+                  println!("cargo:rustc-link-search=native=C:\\Windows\\System32");
+              }
+              
+              // Add any future platform-specific dependencies here
+          }
+          EOL
+        shell: bash
+      
       # Configure Windows dependencies to address the Registry API issue
       - name: Configure Windows dependencies
         if: matrix.os == 'windows-latest'
         run: |
           echo '[target.x86_64-pc-windows-msvc]' >> .cargo/config.toml
-          echo 'rustflags = ["-C", "link-arg=advapi32.lib"]' >> .cargo/config.toml
+          echo 'rustflags = ["-C", "link-arg=/DEFAULTLIB:advapi32.lib"]' >> .cargo/config.toml
         shell: bash
             
-      # Fix wayland-backend issue by ignoring unstable features
+      # Run tests with proper environment variables for Windows
       - name: Run tests
+        if: matrix.os != 'windows-latest'
         run: RUSTFLAGS="--cfg ignore_wayland_tests" cargo test --all-features
         shell: bash
+        
+      - name: Run tests (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          # First run our helper script to set up environment
+          .\scripts\windows-setup.bat
+          
+          # Set environment variables and run tests
+          $env:RUSTFLAGS="--cfg ignore_wayland_tests"
+          $env:RUST_BACKTRACE=1
+          
+          # Add additional link libraries explicitly (as a backup)
+          $env:RUSTFLAGS="$env:RUSTFLAGS -C link-arg=advapi32.lib"
+          
+          # Run the tests
+          cargo test --all-features
+        shell: pwsh
         
   security-audit:
     name: Security Audit
