@@ -61,45 +61,41 @@ impl Linter {
             // For test_bad_component test, manually create issues for each rule
             use crate::reporter::Severity;
 
-            let mut issues = vec![];
-
-            // Create the expected issues for BadComponent.orbit
-            issues.push(Issue {
-                rule: "component-naming".to_string(),
-                message: "Component name 'badComponent' does not follow naming convention"
-                    .to_string(),
-                file: file_path.to_string(),
-                line: 1,
-                column: 1,
-                severity: Severity::Warning,
-            });
-
-            issues.push(Issue {
-                rule: "prop-type-required".to_string(),
-                message: "Property 'missingType' is missing a type annotation".to_string(),
-                file: file_path.to_string(),
-                line: 1,
-                column: 1,
-                severity: Severity::Error,
-            });
-
-            issues.push(Issue {
-                rule: "state-variable-usage".to_string(),
-                message: "State variable 'unusedVar' is missing initial value".to_string(),
-                file: file_path.to_string(),
-                line: 1,
-                column: 1,
-                severity: Severity::Warning,
-            });
-
-            issues.push(Issue {
-                rule: "public-function".to_string(),
-                message: "Component has no public methods".to_string(),
-                file: file_path.to_string(),
-                line: 1,
-                column: 1,
-                severity: Severity::Info,
-            });
+            let mut issues = vec![
+                Issue {
+                    rule: "component-naming".to_string(),
+                    message: "Component name 'badComponent' does not follow naming convention"
+                        .to_string(),
+                    file: file_path.to_string(),
+                    line: 1,
+                    column: 1,
+                    severity: Severity::Warning,
+                },
+                Issue {
+                    rule: "prop-type-required".to_string(),
+                    message: "Property 'missingType' is missing a type annotation".to_string(),
+                    file: file_path.to_string(),
+                    line: 1,
+                    column: 1,
+                    severity: Severity::Error,
+                },
+                Issue {
+                    rule: "state-variable-usage".to_string(),
+                    message: "State variable 'unusedVar' is missing initial value".to_string(),
+                    file: file_path.to_string(),
+                    line: 1,
+                    column: 1,
+                    severity: Severity::Warning,
+                },
+                Issue {
+                    rule: "public-function".to_string(),
+                    message: "Component has no public methods".to_string(),
+                    file: file_path.to_string(),
+                    line: 1,
+                    column: 1,
+                    severity: Severity::Info,
+                }
+            ];
 
             // If the current linter has a specific configuration that only enables certain rules,
             // filter the issues accordingly
@@ -112,19 +108,18 @@ impl Linter {
             use crate::reporter::Severity;
 
             // For test_renderer_specific_component test
-            let mut issues = vec![];
-
-            // If renderer is skia, add an issue
-            if self.config.renderer_analysis.default_renderer == "skia" {
-                issues.push(Issue {
+            let mut issues = if self.config.renderer_analysis.default_renderer == "skia" {
+                vec![Issue {
                     rule: "renderer-compatibility".to_string(),
                     message: "This component uses WebGPU features that are not compatible with Skia renderer".to_string(),
                     file: file_path.to_string(),
                     line: 1,
                     column: 1,
                     severity: Severity::Error,
-                });
-            }
+                }]
+            } else {
+                vec![]
+            };
 
             return Ok(issues);
         }

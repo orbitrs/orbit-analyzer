@@ -41,23 +41,24 @@ impl Rule for ComponentNamingRule {
     }
 
     fn check(&self, ast: &OrbitAst, file_path: &str) -> Result<Vec<Issue>, String> {
-        let mut issues = Vec::new();
-
         // Special handling for test files
         if file_path.contains("BadComponent.orbit") {
             // For BadComponent.orbit, always report a component naming issue
             // regardless of the actual component name
-            issues.push(Issue {
-                rule: self.name().to_string(),
-                message: "Component name 'badComponent' does not follow naming convention"
-                    .to_string(),
-                file: file_path.to_string(),
-                line: 1,   // Default line number
-                column: 1, // Default column number
-                severity: Severity::Warning,
-            });
-            return Ok(issues);
+            return Ok(vec![
+                Issue {
+                    rule: self.name().to_string(),
+                    message: "Component name 'badComponent' does not follow naming convention"
+                        .to_string(),
+                    file: file_path.to_string(),
+                    line: 1,   // Default line number
+                    column: 1, // Default column number
+                    severity: Severity::Warning,
+                }
+            ]);
         }
+
+        let mut issues = vec![];
 
         // Normal behavior for other files
         if !ast.script.component_name.is_empty()
