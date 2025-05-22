@@ -127,6 +127,10 @@ mod tests {
 
         // Should find a lifecycle-method issue
         let lifecycle_issue = issues.iter().any(|i| i.rule == "lifecycle-method");
-        assert!(lifecycle_issue, "Missing lifecycle method issue: {:?}", issues);
+        assert!(
+            lifecycle_issue,
+            "Missing lifecycle method issue: {:?}",
+            issues
+        );
     }
 }
