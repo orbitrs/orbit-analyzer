@@ -22,26 +22,23 @@ jobs:
     name: Format & Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      # Create workspace directory for handling dependencies
+      - name: Create workspace directory
+        run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
+
+      # Checkout repositories in workspace structure
+      - name: Checkout orlint
         uses: actions/checkout@v4
-      
-      # Set up cargo workspace and dependencies first
-      - name: Set up workspace
-        run: |
-          mkdir -p .cargo
-          echo '[workspace]' > Cargo.toml.tmp
-          echo 'members = ["."]' >> Cargo.toml.tmp
-          echo '[patch."https://github.com/orbitrs/orbitui.git"]' > .cargo/config.toml
-          echo 'orbitui = { path = "./orbitui_dep" }' >> .cargo/config.toml
-          cat Cargo.toml >> Cargo.toml.tmp
-          mv Cargo.toml.tmp Cargo.toml
-          
-      - name: Clone orbitui dependency
+        with:
+          path: orbitrs-workspace/orlint
+
+      - name: Checkout orbitui
         uses: actions/checkout@v4
         with:
           repository: orbitrs/orbitui
-          path: orbitui_dep
-          
+          path: orbitrs-workspace/orbitui
+
+      # Install tools and dependencies
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -53,25 +50,38 @@ jobs:
           sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
           
       - name: Cache dependencies
-        uses: actions/cache@v3
+        uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
-            
-      # Run format check on the current package only
-      - name: Check code formatting
+          workspaces: orbitrs-workspace -> target
+          
+      # Create a workspace Cargo.toml at the root
+      - name: Create workspace Cargo.toml
+        working-directory: orbitrs-workspace
+        shell: bash
         run: |
-          cd $GITHUB_WORKSPACE
-          cargo fmt --all -- --check
+          cat > Cargo.toml << 'EOF'
+          [workspace]
+          members = [
+              "orlint",
+              "orbitui"
+          ]
+          resolver = "2"
+
+          [workspace.dependencies]
+          orbitui = { path = "orbitui", version = "0.1.10" }
+          serde = { version = "1.0", features = ["derive"] }
+          thiserror = "1.0"
+          EOF
+            
+      # Run format check from workspace root
+      - name: Check code formatting
+        working-directory: orbitrs-workspace
+        run: cargo fmt --all -- --check
         
+      # Run clippy from workspace root but only for orlint
       - name: Run clippy
-        run: cargo clippy --features ci --all-targets -- -D warnings
+        working-directory: orbitrs-workspace
+        run: cargo clippy --package orlint --all-targets -- -D warnings
         
   test:
     name: Test
@@ -89,149 +99,63 @@ jobs:
             target: x86_64-apple-darwin
       fail-fast: false
     steps:
-      - name: Checkout repository
+      # Create workspace directory for handling dependencies
+      - name: Create workspace directory
+        run: mkdir -p ${{ github.workspace }}/orbitrs-workspace
+
+      # Checkout repositories in workspace structure
+      - name: Checkout orlint
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-      
-      # Set up cargo workspace links
-      - name: Set up workspace
-        run: |
-          mkdir -p .cargo
-          echo '[patch.crates-io]' > .cargo/config.toml
-          echo 'orbitrs = { path = "./orbitrs_dep" }' >> .cargo/config.toml
-        shell: bash
-        
-      # Clone the orbitrs dependency
-      - name: Clone orbitrs dependency
+          path: orbitrs-workspace/orlint
+
+      - name: Checkout orbitui
         uses: actions/checkout@v4
         with:
-          repository: orbitrs/orbitrs
-          path: orbitrs_dep
+          repository: orbitrs/orbitui
+          path: orbitrs-workspace/orbitui
       
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-          target: ${{ matrix.target }}
+          targets: ${{ matrix.target }}
+      
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: orbitrs-workspace -> target
+          key: ${{ matrix.target }}
       
       - name: Install system dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
           sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
-      
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ matrix.target }}-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
-      
-      # Prepare Windows build environment
-      - name: Prepare Windows build environment
-        if: matrix.os == 'windows-latest'
-        run: |
-          # Add a build.rs file to ensure proper linking of Windows libraries if it doesn't exist
-          if [ ! -f "build.rs" ]; then
-            echo '// This build script ensures that advapi32.lib is properly linked on Windows' > build.rs
-            echo '// which is needed by the Skia ICU library for Registry API functions' >> build.rs
-            echo '' >> build.rs
-            echo 'fn main() {' >> build.rs
-            echo '    // Only add Windows-specific linking on Windows MSVC target' >> build.rs
-            echo '    #[cfg(all(target_os = "windows", target_env = "msvc"))]' >> build.rs
-            echo '    {' >> build.rs
-            echo '        // Link advapi32.lib which contains the Windows Registry API' >> build.rs
-            echo '        println!("cargo:rustc-link-lib=dylib=advapi32");' >> build.rs
-            echo '        ' >> build.rs
-            echo '        // Ensure the linker can find the library' >> build.rs
-            echo '        println!("cargo:rustc-link-search=native=C:\\Windows\\System32");' >> build.rs
-            echo '    }' >> build.rs
-            echo '}' >> build.rs
-          fi
           
-          # Create a Windows helper batch file
-          mkdir -p scripts
-          echo '@echo off' > scripts/windows-setup.bat
-          echo 'REM Helper script to ensure proper linking of Windows libraries' >> scripts/windows-setup.bat
-          echo 'REM This addresses the missing advapi32.lib issue with Skia ICU' >> scripts/windows-setup.bat
-          echo '' >> scripts/windows-setup.bat
-          echo 'echo Setting up Windows build environment for OrbitRS...' >> scripts/windows-setup.bat
-          echo '' >> scripts/windows-setup.bat
-          echo 'REM Ensure advapi32.lib is linked' >> scripts/windows-setup.bat
-          echo 'echo Adding advapi32.lib to link libraries' >> scripts/windows-setup.bat
-          echo '' >> scripts/windows-setup.bat
-          echo 'REM Display environment for debugging' >> scripts/windows-setup.bat
-          echo 'echo Windows SDK Dir: %WindowsSdkDir%' >> scripts/windows-setup.bat
-          echo 'echo Windows SDK Version: %WindowsSDKVersion%' >> scripts/windows-setup.bat
-          echo '' >> scripts/windows-setup.bat
-          echo 'REM Add Windows SDK libs to the LIB environment variable' >> scripts/windows-setup.bat
-          echo 'set "LIB=%LIB%;%WindowsSdkDir%\Lib\%WindowsSDKVersion%\um\x64"' >> scripts/windows-setup.bat
-          echo 'echo Updated LIB environment variable' >> scripts/windows-setup.bat
-          echo '' >> scripts/windows-setup.bat
-          echo 'exit /b 0' >> scripts/windows-setup.bat
-          
-          # Create .cargo/config.toml with correct Windows linker settings in the dependency repo too
-          mkdir -p orbitrs_dep/.cargo
-          echo '[target.x86_64-pc-windows-msvc]' > orbitrs_dep/.cargo/config.toml
-          echo 'rustflags = ["-C", "link-arg=/DEFAULTLIB:advapi32.lib"]' >> orbitrs_dep/.cargo/config.toml
-          
-          # Create build.rs for orbitrs dependency as well
-          echo '// This build script ensures all required libraries are properly linked' > orbitrs_dep/build.rs
-          echo '// It is particularly important for Windows where advapi32.lib is needed for the Skia ICU library' >> orbitrs_dep/build.rs
-          echo '' >> orbitrs_dep/build.rs
-          echo 'fn main() {' >> orbitrs_dep/build.rs
-          echo '    // Windows-specific linking for MSVC target' >> orbitrs_dep/build.rs
-          echo '    #[cfg(all(target_os = "windows", target_env = "msvc"))]' >> orbitrs_dep/build.rs
-          echo '    {' >> orbitrs_dep/build.rs
-          echo '        // Link advapi32.lib which contains the Windows Registry API' >> orbitrs_dep/build.rs
-          echo '        println!("cargo:rustc-link-lib=dylib=advapi32");' >> orbitrs_dep/build.rs
-          echo '        ' >> orbitrs_dep/build.rs
-          echo '        // Ensure the linker can find the library' >> orbitrs_dep/build.rs
-          echo '        println!("cargo:rustc-link-search=native=C:\\\\Windows\\\\System32");' >> orbitrs_dep/build.rs
-          echo '    }' >> orbitrs_dep/build.rs
-          echo '    ' >> orbitrs_dep/build.rs
-          echo '    // Add any future platform-specific dependencies here' >> orbitrs_dep/build.rs
-          echo '}' >> orbitrs_dep/build.rs
+      # Create workspace Cargo.toml at the root
+      - name: Create workspace Cargo.toml
+        working-directory: orbitrs-workspace
         shell: bash
-      
-      # Configure Windows dependencies to address the Registry API issue
-      - name: Configure Windows dependencies
-        if: matrix.os == 'windows-latest'
         run: |
-          echo '[target.x86_64-pc-windows-msvc]' >> .cargo/config.toml
-          echo 'rustflags = ["-C", "link-arg=/DEFAULTLIB:advapi32.lib"]' >> .cargo/config.toml
-        shell: bash
-            
-      # Run tests with proper environment variables for Windows
+          cat > Cargo.toml << 'EOF'
+          [workspace]
+          members = [
+              "orlint",
+              "orbitui"
+          ]
+          resolver = "2"
+
+          [workspace.dependencies]
+          orbitui = { path = "orbitui", version = "0.1.10" }
+          serde = { version = "1.0", features = ["derive"] }
+          thiserror = "1.0"
+          EOF
+      
+      # Run tests from workspace root but only for orlint
       - name: Run tests
-        if: matrix.os != 'windows-latest'
-        run: RUSTFLAGS="--cfg ignore_wayland_tests" cargo test --all-features
+        working-directory: orbitrs-workspace
+        run: RUSTFLAGS="--cfg ignore_wayland_tests" cargo test --package orlint --target ${{ matrix.target }} --all-features
         shell: bash
-        
-      - name: Run tests (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          # First run our helper script to set up environment
-          .\scripts\windows-setup.bat
-          
-          # Set environment variables and run tests
-          $env:RUSTFLAGS="--cfg ignore_wayland_tests"
-          $env:RUST_BACKTRACE=1
-          
-          # Add additional link libraries explicitly (as a backup)
-          $env:RUSTFLAGS="$env:RUSTFLAGS -C link-arg=advapi32.lib"
-          
-          # Run the tests
-          cargo test --all-features
-        shell: pwsh
         
   security-audit:
     name: Security Audit
@@ -239,30 +163,50 @@ jobs:
     needs: check
     timeout-minutes: 15
     steps:
-      - name: Checkout repository
+      # Create workspace directory for handling dependencies
+      - name: Create workspace directory
+        run: mkdir -p ${{ github.workspace }}/orbitrs-workspace
+
+      # Checkout repositories in workspace structure
+      - name: Checkout orlint
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-      
-      # Set up cargo workspace links
-      - name: Set up workspace
-        run: |
-          mkdir -p .cargo
-          echo '[patch.crates-io]' > .cargo/config.toml
-          echo 'orbitrs = { path = "./orbitrs_dep" }' >> .cargo/config.toml
-      
-      # Clone the orbitrs dependency
-      - name: Clone orbitrs dependency
+          path: orbitrs-workspace/orlint
+
+      - name: Checkout orbitui
         uses: actions/checkout@v4
         with:
-          repository: orbitrs/orbitrs
-          path: orbitrs_dep
+          repository: orbitrs/orbitui
+          path: orbitrs-workspace/orbitui
       
       - name: Install cargo-audit
-        run: cargo install cargo-audit
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-audit
       
+      # Create workspace Cargo.toml at the root
+      - name: Create workspace Cargo.toml
+        working-directory: orbitrs-workspace
+        shell: bash
+        run: |
+          cat > Cargo.toml << 'EOF'
+          [workspace]
+          members = [
+              "orlint",
+              "orbitui"
+          ]
+          resolver = "2"
+
+          [workspace.dependencies]
+          orbitui = { path = "orbitui", version = "0.1.10" }
+          serde = { version = "1.0", features = ["derive"] }
+          thiserror = "1.0"
+          EOF
+      
+      # Run audit from workspace root
       - name: Run security audit
-        run: cargo audit --ignore RUSTSEC-0000-0000 || true
+        working-directory: orbitrs-workspace
+        run: cargo audit
         
   outdated-dependencies:
     name: Check Outdated Dependencies
@@ -270,141 +214,50 @@ jobs:
     needs: check
     timeout-minutes: 15
     steps:
-      - name: Checkout repository
+      # Create workspace directory for handling dependencies
+      - name: Create workspace directory
+        run: mkdir -p ${{ github.workspace }}/orbitrs-workspace
+
+      # Checkout repositories in workspace structure
+      - name: Checkout orlint
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-      
-      # Set up cargo workspace links
-      - name: Set up workspace
-        run: |
-          mkdir -p .cargo
-          echo '[patch.crates-io]' > .cargo/config.toml
-          echo 'orbitrs = { path = "./orbitrs_dep" }' >> .cargo/config.toml
-      
-      # Clone the orbitrs dependency
-      - name: Clone orbitrs dependency
+          path: orbitrs-workspace/orlint
+
+      - name: Checkout orbitui
         uses: actions/checkout@v4
         with:
-          repository: orbitrs/orbitrs
-          path: orbitrs_dep
+          repository: orbitrs/orbitui
+          path: orbitrs-workspace/orbitui
       
       - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
+        uses: dtolnay/rust-toolchain@stable
       
       - name: Install cargo-outdated
-        run: cargo install cargo-outdated
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-outdated
       
+      # Create workspace Cargo.toml at the root
+      - name: Create workspace Cargo.toml
+        working-directory: orbitrs-workspace
+        shell: bash
+        run: |
+          cat > Cargo.toml << 'EOF'
+          [workspace]
+          members = [
+              "orlint",
+              "orbitui"
+          ]
+          resolver = "2"
+
+          [workspace.dependencies]
+          orbitui = { path = "orbitui", version = "0.1.10" }
+          serde = { version = "1.0", features = ["derive"] }
+          thiserror = "1.0"
+          EOF
+          
+      # Run outdated from workspace root
       - name: Check for outdated dependencies
-        run: cargo outdated --exit-code 0 || true
-        
-  benchmark:
-    name: Run Benchmarks
-    runs-on: ubuntu-latest
-    needs: check
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    timeout-minutes: 30
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      
-      # Set up cargo workspace links
-      - name: Set up workspace
-        run: |
-          mkdir -p .cargo
-          echo '[patch.crates-io]' > .cargo/config.toml
-          echo 'orbitrs = { path = "./orbitrs_dep" }' >> .cargo/config.toml
-      
-      # Clone the orbitrs dependency
-      - name: Clone orbitrs dependency
-        uses: actions/checkout@v4
-        with:
-          repository: orbitrs/orbitrs
-          path: orbitrs_dep
-      
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
-      
-      - name: Setup Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-        
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
-      
-      - name: Install cargo-criterion
-        run: cargo install cargo-criterion
-      
-      - name: Create benchmark directory
-        run: mkdir -p benches
-        shell: bash
-      
-      - name: Create benchmark file
-        run: |
-          cat > benches/basic.rs << 'EOL'
-          use criterion::{criterion_group, criterion_main, Criterion};
-
-          fn parse_benchmark(c: &mut Criterion) {
-              c.bench_function("parse orbit file", |b| {
-                  b.iter(|| {
-                      let content = r#"
-          <template>
-            <div>{{ label }}</div>
-          </template>
-          <script>
-          component Button {
-            props {
-              label: string;
-            }
-          }
-          </script>
-          <style>
-          .button {}
-          </style>
-          "#;
-                      orlint::parser::parse_orbit_file(content, "Button.orbit").unwrap()
-                  });
-              });
-          }
-
-          criterion_group!(benches, parse_benchmark);
-          criterion_main!(benches);
-          EOL
-        shell: bash
-      
-      - name: Add criterion dependency
-        run: |
-          if ! grep -q "criterion" Cargo.toml; then
-            echo -e "\n[dev-dependencies]\ncriterion = \"0.5\"" >> Cargo.toml
-          fi
-        shell: bash
-      
-      - name: Run benchmarks
-        run: cargo criterion --output-format=quiet || true
-        shell: bash
-      
-      - name: Store benchmark results
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-results
-          path: target/criterion
+        working-directory: orbitrs-workspace
+        run: cargo outdated --packages orlint --exit-code 0
