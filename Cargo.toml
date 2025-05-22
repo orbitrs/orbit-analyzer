@@ -10,7 +10,15 @@ description = "Static analysis tool for Orbit UI framework files"
 
 [dependencies]
 # Core dependencies
-orbitrs = { path = "../orbitrs" }
+orbitrs = { path = "../orbitrs", optional = true }
+
+[features]
+default = ["local"]
+local = ["orbitrs"]
+ci = []
+
+[target.'cfg(feature = "ci")'.dependencies]
+orbitrs = { path = "./orbitrs_dep" }
 
 # Parser libraries
 syn = { version = "2.0", features = ["full", "extra-traits"] }
