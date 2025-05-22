@@ -18,19 +18,18 @@ inline_styles = true
 # Default severity level for all rules
 default_severity = "warning"
 
+# Rule severity levels
+rule_severity = { "non-empty-template" = "error", "public-function" = "info" }
+
 # Individual rule configurations
 [rules.component-naming]
 enabled = true
-severity = "warning"
 
 [rules.prop-type-required]
 enabled = true
-severity = "warning"
 
 [rules.non-empty-template]
 enabled = true
-severity = "error"
 
 [rules.public-function]
 enabled = true
-severity = "info"

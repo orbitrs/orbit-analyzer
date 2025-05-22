@@ -8,7 +8,7 @@ pub use component_rules::{
 };
 
 use crate::reporter::Issue;
-use orbitui::parser::OrbitAst;
+use orbit::parser::OrbitAst;
 
 /// Trait for lint rules
 pub trait Rule {
@@ -37,7 +37,7 @@ impl Rule for NonEmptyTemplateRule {
     fn check(&self, ast: &OrbitAst, file_path: &str) -> Result<Vec<Issue>, String> {
         let mut issues = Vec::new();
 
-        if let orbitui::parser::TemplateNode::Element { children, .. } = &ast.template {
+        if let orbit::parser::TemplateNode::Element { children, .. } = &ast.template {
             if children.is_empty() {
                 issues.push(Issue {
                     rule: self.name().to_string(),

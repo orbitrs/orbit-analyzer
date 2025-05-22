@@ -32,11 +32,11 @@ jobs:
         with:
           path: orbitrs-workspace/orlint
 
-      - name: Checkout orbitui
+      - name: Checkout orbit
         uses: actions/checkout@v4
         with:
-          repository: orbitrs/orbitui
-          path: orbitrs-workspace/orbitui
+          repository: orbitrs/orbit
+          path: orbitrs-workspace/orbit
 
       # Install tools and dependencies
       - name: Install Rust toolchain
@@ -63,12 +63,12 @@ jobs:
           [workspace]
           members = [
               "orlint",
-              "orbitui"
+              "orbit"
           ]
           resolver = "2"
 
           [workspace.dependencies]
-          orbitui = { path = "orbitui", version = "0.1.10" }
+          orbit = { path = "orbit", version = "0.1.10" }
           serde = { version = "1.0", features = ["derive"] }
           thiserror = "1.0"
           EOF
@@ -109,11 +109,11 @@ jobs:
         with:
           path: orbitrs-workspace/orlint
 
-      - name: Checkout orbitui
+      - name: Checkout orbit
         uses: actions/checkout@v4
         with:
-          repository: orbitrs/orbitui
-          path: orbitrs-workspace/orbitui
+          repository: orbitrs/orbit
+          path: orbitrs-workspace/orbit
       
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -141,12 +141,12 @@ jobs:
           [workspace]
           members = [
               "orlint",
-              "orbitui"
+              "orbit"
           ]
           resolver = "2"
 
           [workspace.dependencies]
-          orbitui = { path = "orbitui", version = "0.1.10" }
+          orbit = { path = "orbit", version = "0.1.10" }
           serde = { version = "1.0", features = ["derive"] }
           thiserror = "1.0"
           EOF
@@ -173,11 +173,11 @@ jobs:
         with:
           path: orbitrs-workspace/orlint
 
-      - name: Checkout orbitui
+      - name: Checkout orbit
         uses: actions/checkout@v4
         with:
-          repository: orbitrs/orbitui
-          path: orbitrs-workspace/orbitui
+          repository: orbitrs/orbit
+          path: orbitrs-workspace/orbit
       
       - name: Install cargo-audit
         uses: taiki-e/install-action@v2
@@ -193,12 +193,12 @@ jobs:
           [workspace]
           members = [
               "orlint",
-              "orbitui"
+              "orbit"
           ]
           resolver = "2"
 
           [workspace.dependencies]
-          orbitui = { path = "orbitui", version = "0.1.10" }
+          orbit = { path = "orbit", version = "0.1.10" }
           serde = { version = "1.0", features = ["derive"] }
           thiserror = "1.0"
           EOF
@@ -224,11 +224,11 @@ jobs:
         with:
           path: orbitrs-workspace/orlint
 
-      - name: Checkout orbitui
+      - name: Checkout orbit
         uses: actions/checkout@v4
         with:
-          repository: orbitrs/orbitui
-          path: orbitrs-workspace/orbitui
+          repository: orbitrs/orbit
+          path: orbitrs-workspace/orbit
       
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
@@ -247,12 +247,12 @@ jobs:
           [workspace]
           members = [
               "orlint",
-              "orbitui"
+              "orbit"
           ]
           resolver = "2"
 
           [workspace.dependencies]
-          orbitui = { path = "orbitui", version = "0.1.10" }
+          orbit = { path = "orbit", version = "0.1.10" }
           serde = { version = "1.0", features = ["derive"] }
           thiserror = "1.0"
           EOF
