@@ -237,3 +237,44 @@ impl Rule for StateVariableRule {
         Ok(issues)
     }
 }
+
+/// Rule for checking presence of lifecycle methods in components
+pub struct LifecycleMethodRule;
+
+impl Rule for LifecycleMethodRule {
+    fn name(&self) -> &'static str {
+        "lifecycle-method"
+    }
+
+    fn description(&self) -> &'static str {
+        "Component should implement at least one lifecycle method (e.g., mounted, updated, destroyed)"
+    }
+
+    fn check(&self, ast: &OrbitAst, file_path: &str) -> Result<Vec<Issue>, String> {
+        // List of recognized lifecycle methods
+        let lifecycle_methods = ["mounted", "updated", "destroyed"];
+        let mut found = false;
+        let mut found_methods = vec![];
+
+        // Check if any lifecycle method is present in the AST
+        for method in &ast.script.methods {
+            if lifecycle_methods.contains(&method.name.as_str()) {
+                found = true;
+                found_methods.push(method.name.clone());
+            }
+        }
+
+        if found {
+            Ok(vec![])
+        } else {
+            Ok(vec![Issue {
+                rule: self.name().to_string(),
+                message: "Component does not implement any recognized lifecycle method (e.g., mounted, updated, destroyed)".to_string(),
+                file: file_path.to_string(),
+                line: 1,
+                column: 1,
+                severity: Severity::Warning,
+            }])
+        }
+    }
+}

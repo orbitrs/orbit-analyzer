@@ -10,6 +10,7 @@ This document covers common issues you might encounter when using Orbit Analyzer
 - [Performance Issues](#performance-issues)
 - [Common Rule Errors](#common-rule-errors)
 - [CI/CD Integration Issues](#cicd-integration-issues)
+- [Cross-Platform Compatibility](#cross-platform-compatibility)
 
 ## Installation Issues
 
@@ -260,3 +261,19 @@ orlint analyze --fail-on warning path/to/components/
 ```
 
 This will cause the analyzer to exit with code 1 if any warnings or errors are found.
+
+## Cross-Platform Compatibility
+
+### Windows-Specific Issues
+
+**Problem**: Analysis or tests fail only on Windows, but not on Linux/macOS. Example error: `Unexpected token: Equal` or test failures related to file paths.
+
+**Solution**:
+
+- Orlint now uses platform-independent path handling and improved test file detection. If you encounter issues:
+  1. Ensure you are using the latest version of Orlint (reinstall if needed).
+  2. Check for any hardcoded path separators (`/` or `\`) in your custom scripts or CI workflows and use platform-agnostic methods where possible.
+  3. If you see errors related to file parsing, try normalizing line endings (use LF `\n` if possible) and ensure your `.orbit` files do not use unsupported syntax.
+  4. Report any remaining platform-specific bugs to the Orlint issue tracker with details about your OS and error output.
+
+**Note:** The Orlint test suite and parser are now validated on Linux, macOS, and Windows in CI.

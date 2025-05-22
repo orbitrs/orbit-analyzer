@@ -2,11 +2,13 @@
 
 This guide shows how to integrate Orbit Analyzer with Visual Studio Code for real-time linting of your .orbit files.
 
+> **Note:** As of v0.1.x, Orbit Analyzer and the VSCode extension are fully cross-platform (Windows, macOS, and Linux). Path handling and test detection are robust across all supported operating systems. See the [Troubleshooting Guide](troubleshooting.md) for platform-specific tips.
+
 ## Prerequisites
 
 Before setting up the VSCode integration, make sure you have:
 
-1. Installed the Orbit Analyzer CLI tool
+1. Installed the Orbit Analyzer CLI tool (now cross-platform)
 2. Visual Studio Code installed on your system
 
 ## Integration Options
@@ -21,11 +23,12 @@ There are two main ways to integrate Orbit Analyzer with VSCode:
 The official Orbit VSCode Extension provides first-class support for .orbit files, including:
 
 - Syntax highlighting for .orbit files
-- Real-time linting using Orbit Analyzer
+- Real-time linting using Orbit Analyzer (cross-platform)
 - Quick fixes for common issues
 - Hover information for components and props
 - Go-to-definition and find-references support
 - Auto-completion for components, props, and events
+- **Support for new lint rules** (see [Roadmap](roadmap/implementation-phases.md))
 
 ### Installation
 
@@ -42,8 +45,10 @@ The extension reads your project's `.orlint.toml` file automatically. You can al
 2. Search for "Orbit"
 3. Configure settings such as:
    - `orbit.analyzer.enable`: Enable/disable the analyzer
-   - `orbit.analyzer.rules`: Specify which rules to enable
+   - `orbit.analyzer.rules`: Specify which rules to enable (including new rules like lifecycle method checks)
    - `orbit.analyzer.severities`: Configure rule severities
+
+> **Tip:** As new rules are added (e.g., lifecycle method checks, event handler naming, prop validation), you can enable or customize them in your `.orlint.toml` or via the extension settings. See the [Custom Lint Rules Guide](custom-lint-rules.md) and [Implementation Phases](roadmap/implementation-phases.md) for details.
 
 ### Usage
 
@@ -132,10 +137,16 @@ This will provide basic syntax highlighting even without the extension.
 
 If you encounter issues with VSCode integration:
 
-1. Make sure the `orlint` CLI is in your PATH and works from the terminal
+1. Make sure the `orlint` CLI is in your PATH and works from the terminal (cross-platform support is now robust)
 2. Check that your .orbit files have the correct format
-3. Verify your `.orlint.toml` configuration is valid
+3. Verify your `.orlint.toml` configuration is valid (especially for new rules)
 4. Look for error messages in the OUTPUT panel (View > Output) with "Tasks" selected
+5. See the [Troubleshooting Guide](troubleshooting.md) for platform-specific issues and solutions
+
+## Roadmap and New Features
+
+- See the [Implementation Phases](roadmap/implementation-phases.md) for details on new and upcoming lint rules (e.g., lifecycle method checks, event handler naming, prop validation, state mutation, etc.).
+- The extension and CLI will continue to improve with enhanced reporting, rule customization, and performance optimizations.
 
 ## Additional Resources
 

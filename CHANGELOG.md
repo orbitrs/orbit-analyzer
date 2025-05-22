@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependency compatibility with orbit core library
 - Code organization improvements for better maintainability
 - Added proper error handling for parsing issues
+- Cross-platform path handling for Windows compatibility
+- Improved test file detection across operating systems
 
 ## [0.1.0] - 2025-05-21
 - Initial public release

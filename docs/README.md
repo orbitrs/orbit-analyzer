@@ -2,6 +2,12 @@
 
 Welcome to the Orbit Analyzer documentation. This guide will help you understand how to use and extend the Orbit Analyzer tool to validate, analyze, and enforce best practices for Orbit UI components.
 
+> **Note:** Orlint is tested and supported on Linux, macOS, and Windows. See the [troubleshooting guide](troubleshooting.md#cross-platform-compatibility) for platform-specific tips.
+
+## Roadmap & Implementation Phases
+
+See [docs/roadmap/implementation-phases.md](../roadmap/implementation-phases.md) for a detailed breakdown of current and planned features.
+
 ## Contents
 
 - [Getting Started](#getting-started)

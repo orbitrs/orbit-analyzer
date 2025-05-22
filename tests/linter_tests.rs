@@ -114,4 +114,19 @@ mod tests {
             issues
         );
     }
+
+    #[test]
+    fn test_lifecycle_method_rule() {
+        let config = Config::default();
+        let linter = Linter::with_config(config);
+
+        let file_path = example_path("BadComponent.orbit");
+        let content = std::fs::read_to_string(&file_path).unwrap();
+
+        let issues = linter.lint(&content, &file_path).unwrap();
+
+        // Should find a lifecycle-method issue
+        let lifecycle_issue = issues.iter().any(|i| i.rule == "lifecycle-method");
+        assert!(lifecycle_issue, "Missing lifecycle method issue: {:?}", issues);
+    }
 }

@@ -33,6 +33,7 @@ impl Linter {
         linter.add_rule(crate::rules::ComponentNamingRule::new());
         linter.add_rule(crate::rules::PropTypeRule);
         linter.add_rule(crate::rules::StateVariableRule);
+        linter.add_rule(crate::rules::LifecycleMethodRule); // Register lifecycle method rule
 
         // Add renderer-specific rules if enabled
         if linter.config.renderer_analysis.enabled {

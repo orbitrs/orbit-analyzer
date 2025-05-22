@@ -4,7 +4,7 @@
 mod component_rules;
 
 pub use component_rules::{
-    ComponentNamingRule, PropTypeRule, RendererCompatibilityRule, StateVariableRule,
+    ComponentNamingRule, PropTypeRule, RendererCompatibilityRule, StateVariableRule, LifecycleMethodRule,
 };
 
 use crate::reporter::Issue;

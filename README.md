@@ -139,11 +139,13 @@ output_path = "analysis_report.json"
 
 ## 🛣️ Roadmap & Future Plans
 
-* **v0.1:** Basic syntax validation, CLI tool, simple reporting.
-* **v0.2:** Semantic analysis, enhanced lint rules, configurable CLI options.
-* **v0.3:** Custom lint rule plugins, integration with Orbit CLI (`orbiton`).
-* **v0.4:** IDE integration (VSCode extension), improved performance optimizations.
-* **v1.0:** Stable release, comprehensive documentation, community-driven rules repository.
+* **v0.1:** Basic syntax validation, CLI tool, simple reporting, cross-platform compatibility (Linux, macOS, Windows).
+* **v0.2:** Semantic analysis, enhanced lint rules, configurable CLI options, improved error recovery.
+* **v0.3:** Custom lint rule plugins, integration with Orbit CLI (`orbiton`), JSON/HTML reporting, performance improvements.
+* **v0.4:** IDE integration (VSCode extension), LSP support, auto-formatting, quick fixes, refactoring tools.
+* **v1.0:** Stable release, comprehensive documentation, community-driven rules repository, security and accessibility checks.
+
+See [`docs/roadmap/implementation-phases.md`](docs/roadmap/implementation-phases.md) for a detailed breakdown of planned features and phases.
 
 ---
 
