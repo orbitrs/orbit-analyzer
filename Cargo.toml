@@ -45,3 +45,7 @@ path = "src/main.rs"
 
 [dev-dependencies]
 criterion = "0.5"
+
+# Patch sections to override dependency sources in different environments
+[patch."https://github.com/orbitrs/orbitrs.git"]
+orbitrs = { path = "../orbitrs" }
