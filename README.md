@@ -141,4 +141,10 @@ For questions, feature requests, or support, please open an issue on the GitHub 
 
 ---
 
+## 🧩 Development
+
+For information about setting up the project for development, dependency management, and contributing, see the [Development Guide](DEVELOPMENT.md).
+
+---
+
 **Orbit Analyzer** — Helping you write better Orbit code, one lint at a time.

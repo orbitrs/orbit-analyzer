@@ -14,4 +14,56 @@ permissions:
 
 jobs:
   ci:
-    uses: orbitrs/orbit-workflows/.github/workflows/rust-ci.yml@main
+    name: Run CI
+    runs-on: ubuntu-latest
+    steps:
+      # Create a directory structure that matches our local development environment
+      # This ensures that the relative path "../orbitrs" in .cargo/config.toml works correctly
+      - name: Create workspace directory
+        run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
+      
+      - name: Checkout orbit-analyzer
+        uses: actions/checkout@v4
+        with:
+          path: orbitrs-workspace/orbit-analyzer
+      
+      # This matches the local development structure where orbitrs is a sibling directory
+      # to orbit-analyzer, enabling the path override in .cargo/config.toml to work
+      - name: Checkout orbitrs
+        uses: actions/checkout@v4
+        with:
+          repository: orbitrs/orbitrs
+          path: orbitrs-workspace/orbitrs
+          
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            orbitrs-workspace/orbit-analyzer -> target
+            
+      - name: Verify dependency path
+        run: |
+          echo "Verifying that orbitrs dependency can be found at ../orbitrs"
+          if [ -f "orbitrs-workspace/orbitrs/Cargo.toml" ]; then
+            echo "orbitrs/Cargo.toml found!"
+          else
+            echo "ERROR: orbitrs/Cargo.toml not found"
+            exit 1
+          fi
+            
+      - name: Check code formatting
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: cargo fmt --all -- --check
+        
+      - name: Run clippy
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: cargo clippy --all-targets --all-features -- -D warnings
+        
+      - name: Run tests
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: cargo test --all-features
