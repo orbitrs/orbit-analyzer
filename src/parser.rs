@@ -2,7 +2,7 @@
 
 use crate::AnalyzerError;
 use crate::Result;
-use orbitrs::parser::{OrbitAst, OrbitParser};
+use orbitui::parser::{OrbitAst, OrbitParser};
 
 // Define a structure to hold data for our mock AST
 #[derive(Debug)]

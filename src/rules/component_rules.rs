@@ -3,7 +3,7 @@
 
 use crate::reporter::{Issue, Severity};
 use crate::rules::Rule;
-use orbitrs::parser::OrbitAst;
+use orbitui::parser::OrbitAst;
 
 /// Rule for checking component naming conventions
 pub struct ComponentNamingRule {
