@@ -1,6 +1,6 @@
 <template>
   <div class="button-container">
-    <button @click="handleClick" class="button" v-class:primary="isPrimary" v-class:disabled="isDisabled">
+    <button @click="handleClick" class="button">
       {{ label }}
     </button>
   </div>
