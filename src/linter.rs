@@ -94,7 +94,7 @@ impl Linter {
                     line: 1,
                     column: 1,
                     severity: Severity::Info,
-                }
+                },
             ];
 
             // If the current linter has a specific configuration that only enables certain rules,

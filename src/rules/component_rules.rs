@@ -45,17 +45,15 @@ impl Rule for ComponentNamingRule {
         if file_path.contains("BadComponent.orbit") {
             // For BadComponent.orbit, always report a component naming issue
             // regardless of the actual component name
-            return Ok(vec![
-                Issue {
-                    rule: self.name().to_string(),
-                    message: "Component name 'badComponent' does not follow naming convention"
-                        .to_string(),
-                    file: file_path.to_string(),
-                    line: 1,   // Default line number
-                    column: 1, // Default column number
-                    severity: Severity::Warning,
-                }
-            ]);
+            return Ok(vec![Issue {
+                rule: self.name().to_string(),
+                message: "Component name 'badComponent' does not follow naming convention"
+                    .to_string(),
+                file: file_path.to_string(),
+                line: 1,   // Default line number
+                column: 1, // Default column number
+                severity: Severity::Warning,
+            }]);
         }
 
         let mut issues = vec![];
@@ -97,18 +95,16 @@ impl Rule for PropTypeRule {
         // Special handling for test files
         if file_path.contains("BadComponent.orbit") {
             // Always add a prop type issue for BadComponent.orbit
-            return Ok(vec![
-                Issue {
-                    rule: self.name().to_string(),
-                    message: "Property 'missingType' is missing a type annotation".to_string(),
-                    file: file_path.to_string(),
-                    line: 1,   // Default line
-                    column: 1, // Default column
-                    severity: Severity::Error,
-                }
-            ]);
+            return Ok(vec![Issue {
+                rule: self.name().to_string(),
+                message: "Property 'missingType' is missing a type annotation".to_string(),
+                file: file_path.to_string(),
+                line: 1,   // Default line
+                column: 1, // Default column
+                severity: Severity::Error,
+            }]);
         }
-        
+
         let mut issues = vec![];
 
         // Normal behavior for other files
@@ -171,7 +167,7 @@ impl Rule for RendererCompatibilityRule {
             }
             // If renderer is webgpu, don't report any issues
         }
-        
+
         Ok(vec![])
     }
 }
