@@ -108,7 +108,7 @@ impl Linter {
             use crate::reporter::Severity;
 
             // For test_renderer_specific_component test
-            let mut issues = if self.config.renderer_analysis.default_renderer == "skia" {
+            let issues = if self.config.renderer_analysis.default_renderer == "skia" {
                 vec![Issue {
                     rule: "renderer-compatibility".to_string(),
                     message: "This component uses WebGPU features that are not compatible with Skia renderer".to_string(),
