@@ -4,6 +4,23 @@
 
 This document provides information for developers working on the Orbit Analyzer project.
 
+### System Dependencies
+
+The Orbit Analyzer depends on the OrbitRS library, which uses Skia for rendering. This requires the following system dependencies:
+
+#### macOS
+```bash
+brew install fontconfig freetype
+```
+
+#### Ubuntu/Debian Linux
+```bash
+sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+```
+
+#### Windows
+Windows builds typically bundle these dependencies or use vcpkg to manage them.
+
 ## Dependency Management
 
 ### OrbitRS Dependency
@@ -63,3 +80,23 @@ Our CI workflow creates the appropriate directory structure by:
 2. Ensuring the local path override works correctly in CI
 
 This setup allows seamless work between local development and CI environments without manual configuration changes.
+
+## Troubleshooting
+
+### Build Failures due to Missing Libraries
+
+If you encounter linker errors like:
+```
+error: linking with `cc` failed: exit status: 1
+/usr/bin/ld: cannot find -lfontconfig: No such file or directory
+/usr/bin/ld: cannot find -lfreetype: No such file or directory
+```
+
+Make sure you have installed the required system dependencies listed in the "System Dependencies" section above. These are needed because the orbitrs library depends on Skia, which uses fontconfig and freetype for text rendering.
+
+### Version Conflicts
+
+If you encounter dependency conflicts, try the following steps:
+1. Run `cargo update` to update all dependencies
+2. Check that your local orbitrs repository is up to date with the main branch
+3. If you're seeing issues specific to the CI workflow, verify that the workflow is installing all necessary dependencies
