@@ -24,7 +24,7 @@ component Button {
 .button {}
 </style>
 "#;
-            orbit_analyzer::parser::parse_orbit_file(content, "Button.orbit").unwrap()
+            orlint::parser::parse_orbit_file(content, "Button.orbit").unwrap()
         });
     });
 }

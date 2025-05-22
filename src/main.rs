@@ -1,7 +1,7 @@
 // Main entry point for the orlint CLI
 
 use clap::{Args, Parser, Subcommand};
-use orbit_analyzer::{analyze_files_with_config, Config, Reporter, Severity, VERSION};
+use orlint::{analyze_files_with_config, Config, Reporter, Severity, VERSION};
 use std::path::{Path, PathBuf};
 use std::process;
 
@@ -181,7 +181,7 @@ fn validate_command(args: ValidateArgs) -> Result<(), Box<dyn std::error::Error>
     for file in all_files {
         let file_path = file.to_string_lossy();
         match std::fs::read_to_string(&file) {
-            Ok(content) => match orbit_analyzer::parser::parse_orbit_file(&content, &file_path) {
+            Ok(content) => match orlint::parser::parse_orbit_file(&content, &file_path) {
                 Ok(_) => {
                     println!("✅ {}: Valid", file_path);
                 }

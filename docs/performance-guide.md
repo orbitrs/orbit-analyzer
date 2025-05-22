@@ -54,7 +54,7 @@ max_concurrency = 4  # Limit to 4 parallel processes
 Or via environment variable:
 
 ```bash
-ORBIT_ANALYZER_MAX_CONCURRENCY=4 orlint analyze --parallel path/to/components/
+ORLINT_MAX_CONCURRENCY=4 orlint analyze --parallel path/to/components/
 ```
 
 ### When to Avoid Parallel Analysis

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use orbit_analyzer::{Config, Linter};
+    use orlint::{Config, Linter};
     use std::path::Path;
 
     // Helper function to get example file path

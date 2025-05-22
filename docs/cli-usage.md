@@ -169,10 +169,10 @@ Orbit Analyzer respects the following environment variables:
 
 | Variable | Description |
 | -------- | ----------- |
-| `ORBIT_ANALYZER_CONFIG` | Path to configuration file |
-| `ORBIT_ANALYZER_FORMAT` | Default output format |
-| `ORBIT_ANALYZER_QUIET` | Suppress informational output if set to 1 |
-| `ORBIT_ANALYZER_VERBOSE` | Show verbose output if set to 1 |
+| `ORLINT_CONFIG` | Path to configuration file |
+| `ORLINT_FORMAT` | Default output format |
+| `ORLINT_QUIET` | Suppress informational output if set to 1 |
+| `ORLINT_VERBOSE` | Show verbose output if set to 1 |
 
 ## Exit Codes
 

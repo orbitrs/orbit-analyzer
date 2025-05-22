@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use orbit_analyzer::{Config, Severity};
+    use orlint::{Config, Severity};
     use std::path::Path;
 
     #[test]

@@ -17,7 +17,7 @@ The Orbit Analyzer can be used as a library in your Rust projects. This allows f
 ### Example: Basic Analysis
 
 ```rust
-use orbit_analyzer::{Analyzer, Config, ReportFormat};
+use orlint::{Analyzer, Config, ReportFormat};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Create a custom configuration
@@ -50,7 +50,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### Example: Custom Rule Integration
 
 ```rust
-use orbit_analyzer::{Rule, Component, Issue, Severity, Location};
+use orlint::{Rule, Component, Issue, Severity, Location};
 
 struct MyCustomRule;
 
@@ -95,7 +95,7 @@ The Orbit Analyzer supports custom report formats, which can be useful for integ
 ### Creating a Custom Reporter
 
 ```rust
-use orbit_analyzer::{Reporter, AnalysisResults};
+use orlint::{Reporter, AnalysisResults};
 
 struct MyCustomReporter;
 

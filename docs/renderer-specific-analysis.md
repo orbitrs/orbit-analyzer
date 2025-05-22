@@ -191,7 +191,7 @@ Severity: Info
 You can create custom renderer-specific rules to match your project's requirements:
 
 ```rust
-use orbit_analyzer::{Rule, Component, Issue, Severity, Location};
+use orlint::{Rule, Component, Issue, Severity, Location};
 
 struct CustomSkiaRule;
 
