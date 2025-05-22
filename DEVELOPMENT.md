@@ -50,11 +50,11 @@ When the orbitrs library undergoes changes:
 
 #### Potential Version Conflicts
 
-If you experience version conflicts between the specified version and the actual git branch contents:
+By removing the version specification from the git dependency, we eliminate the most common source of version conflicts. If you still experience dependency issues:
 
 1. Ensure your local copy of orbitrs is up to date with the main branch
-2. Update the version number in orbit-analyzer's Cargo.toml to match orbitrs' actual version
-3. If needed, run `cargo update -p orbitrs` to force Cargo to refresh the dependency
+2. Run `cargo update -p orbitrs` to force Cargo to refresh the dependency
+3. If needed, run `cargo clean` followed by `cargo build` to completely rebuild the dependency tree
 
 #### CI Workflow Configuration
 
