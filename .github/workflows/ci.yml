@@ -12,7 +12,7 @@ permissions:
   contents: read
   actions: read
   pull-requests: read
-  id-token: write # This is required for requesting the JWT
+  id-token: write
 
 env:
   CARGO_TERM_COLOR: always
@@ -22,38 +22,35 @@ jobs:
     name: Format & Lint
     runs-on: ubuntu-latest
     steps:
-      # Check out the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-          
-      # Set up cargo workspace links
+        uses: actions/checkout@v4
+      
+      # Set up cargo workspace and dependencies first
       - name: Set up workspace
         run: |
           mkdir -p .cargo
-          echo '[patch.crates-io]' > .cargo/config.toml
+          echo '[workspace]' > Cargo.toml.tmp
+          echo 'members = ["."]' >> Cargo.toml.tmp
+          echo '[patch."https://github.com/orbitrs/orbitrs.git"]' > .cargo/config.toml
           echo 'orbitrs = { path = "./orbitrs_dep" }' >> .cargo/config.toml
+          cat Cargo.toml >> Cargo.toml.tmp
+          mv Cargo.toml.tmp Cargo.toml
           
-      # Clone the orbitrs dependency
       - name: Clone orbitrs dependency
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: orbitrs/orbitrs
           path: orbitrs_dep
+          
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
           
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
-          
-      - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          override: true
-          components: rustfmt, clippy
           
       - name: Cache dependencies
         uses: actions/cache@v3
@@ -67,8 +64,11 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
             
+      # Run format check on the current package only
       - name: Check code formatting
-        run: cargo fmt --all -- --check
+        run: |
+          cd $GITHUB_WORKSPACE
+          cargo fmt --all -- --check
         
       - name: Run clippy
         run: cargo clippy --features ci --all-targets -- -D warnings
@@ -90,7 +90,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       
@@ -104,7 +104,7 @@ jobs:
         
       # Clone the orbitrs dependency
       - name: Clone orbitrs dependency
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: orbitrs/orbitrs
           path: orbitrs_dep
@@ -240,7 +240,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       
@@ -253,7 +253,7 @@ jobs:
       
       # Clone the orbitrs dependency
       - name: Clone orbitrs dependency
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: orbitrs/orbitrs
           path: orbitrs_dep
@@ -271,7 +271,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       
@@ -284,7 +284,7 @@ jobs:
       
       # Clone the orbitrs dependency
       - name: Clone orbitrs dependency
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: orbitrs/orbitrs
           path: orbitrs_dep
@@ -310,7 +310,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 1
       
@@ -323,7 +323,7 @@ jobs:
       
       # Clone the orbitrs dependency
       - name: Clone orbitrs dependency
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: orbitrs/orbitrs
           path: orbitrs_dep
