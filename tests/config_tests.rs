@@ -8,7 +8,7 @@ mod tests {
         // Get the path to example config file
         let config_path = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("examples")
-            .join(".orbit-analyzer.toml");
+            .join(".orlint.toml");
 
         // Load the config
         let config = Config::from_file(&config_path).unwrap();

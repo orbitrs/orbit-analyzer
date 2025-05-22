@@ -1,5 +1,5 @@
 # Orbit Analyzer Configuration
-# Place this file at the root of your project as .orbit-analyzer.toml
+# Place this file at the root of your project as .orlint.toml
 
 # Analyzer settings
 [analyzer]
@@ -19,7 +19,7 @@ disabled_rules = []
 report_format = "text"
 
 # Output file (if not specified, output goes to stdout)
-# output_file = "orbit-analyzer-report.html"
+# output_file = "orlint-report.html"
 
 # Run analysis in parallel for better performance on large codebases
 parallel = true

@@ -133,7 +133,7 @@ For large projects with many .orbit files, performance can be a concern. Here ar
 The Orbit Analyzer can analyze multiple files in parallel:
 
 ```bash
-orbit-analyzer analyze --parallel path/to/components/
+orlint analyze --parallel path/to/components/
 ```
 
 Or programmatically:
@@ -149,7 +149,7 @@ let analyzer = Analyzer::new(config);
 For CI/CD pipelines, you can perform incremental analysis to only check files that have changed:
 
 ```bash
-orbit-analyzer analyze --incremental --git-base main path/to/components/
+orlint analyze --incremental --git-base main path/to/components/
 ```
 
 This will only analyze files that have changed compared to the specified git branch.
@@ -163,7 +163,7 @@ For large codebases with hundreds or thousands of .orbit files:
 Filter which files to analyze:
 
 ```bash
-orbit-analyzer analyze --include "src/components/**/*.orbit" --exclude "src/components/experimental/**"
+orlint analyze --include "src/components/**/*.orbit" --exclude "src/components/experimental/**"
 ```
 
 ### Staged Analysis
@@ -172,10 +172,10 @@ Break down analysis into stages:
 
 ```bash
 # Stage 1: Quick syntax check
-orbit-analyzer analyze --quick-syntax-only path/to/components/
+orlint analyze --quick-syntax-only path/to/components/
 
 # Stage 2: Deep analysis on specific components
-orbit-analyzer analyze --deep src/components/critical/
+orlint analyze --deep src/components/critical/
 ```
 
 ## Integrating with Other Tools
@@ -194,7 +194,7 @@ Use the Orbit Analyzer as a pre-commit hook:
 
 changed_orbit_files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.orbit$')
 if [ -n "$changed_orbit_files" ]; then
-  orbit-analyzer analyze $changed_orbit_files
+  orlint analyze $changed_orbit_files
   if [ $? -ne 0 ]; then
     echo "Orbit Analyzer found issues. Commit aborted."
     exit 1
@@ -207,7 +207,7 @@ fi
 For monorepos with multiple Orbit-based projects:
 
 ```bash
-orbit-analyzer analyze --config-path ./projects/shared/.orbit-analyzer.toml ./projects/*/src
+orlint analyze --config-path ./projects/shared/.orlint.toml ./projects/*/src
 ```
 
 This allows sharing a common configuration across multiple projects.

@@ -1,17 +1,17 @@
 # Monorepo CI Setup Guide
 
-This document explains how the CI system is configured to handle the dependency between `orbit-analyzer` and other parts of the Orbit Framework in the monorepo structure.
+This document explains how the CI system is configured to handle the dependency between `orlint` and other parts of the Orbit Framework in the monorepo structure.
 
 ## Overview
 
-The `orbit-analyzer` CI workflow is designed to work in the Orbit Framework monorepo structure, where several related projects (orbitrs, orbiton, orbitkit, etc.) are developed together. This setup presents unique challenges for CI, particularly because of local dependency paths.
+The `orlint` CI workflow is designed to work in the Orbit Framework monorepo structure, where several related projects (orbitrs, orbiton, orbitkit, etc.) are developed together. This setup presents unique challenges for CI, particularly because of local dependency paths.
 
 ## Dependency Structure
 
-In local development, the `orbit-analyzer` depends on the `orbitrs` crate, which is typically referenced with a local path:
+In local development, the `orlint` depends on the `orbitrs` crate, which is typically referenced with a local path:
 
 ```toml
-# In orbit-analyzer/Cargo.toml
+# In orlint/Cargo.toml
 [dependencies]
 orbitrs = { path = "../orbitrs" }
 ```
@@ -78,7 +78,7 @@ If CI builds are failing, here are common issues and solutions:
 
 ## Adding New Dependencies
 
-When adding new dependencies to `orbit-analyzer`:
+When adding new dependencies to `orlint`:
 
 1. Update both the `Cargo.toml` and CI workflow if necessary
 2. Consider if any new system dependencies need to be installed in CI

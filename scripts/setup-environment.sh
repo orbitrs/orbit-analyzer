@@ -1,23 +1,23 @@
 #!/bin/bash
-# Setup script for orbit-analyzer development environment
+# Setup script for orlint development environment
 
 set -e
 
 # Display banner
 echo "======================================================"
-echo "  Setting up orbit-analyzer development environment"
+echo "  Setting up orlint development environment"
 echo "======================================================"
 
 # Check if we're in the right directory
-if [ ! -f "Cargo.toml" ] || ! grep -q "name = \"orbit-analyzer\"" Cargo.toml; then
-  echo "Error: This script must be run from the orbit-analyzer directory"
+if [ ! -f "Cargo.toml" ] || ! grep -q "name = \"orlint\"" Cargo.toml; then
+  echo "Error: This script must be run from the orlint directory"
   exit 1
 fi
 
 # Check if orbitrs exists in the parent directory
 if [ ! -d "../orbitrs" ]; then
   echo "Error: orbitrs repository not found in parent directory"
-  echo "Please clone the orbitrs repository to the same parent directory as orbit-analyzer"
+  echo "Please clone the orbitrs repository to the same parent directory as orlint"
   exit 1
 fi
 
@@ -83,7 +83,7 @@ if [ $? -eq 0 ]; then
   echo "======================================================"
   echo "  🎉 Setup completed successfully!"
   echo "======================================================"
-  echo "You can now build and run orbit-analyzer with:"
+  echo "You can now build and run orlint with:"
   echo "  cargo build"
   echo "  cargo run"
 else

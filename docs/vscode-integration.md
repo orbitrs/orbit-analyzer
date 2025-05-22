@@ -36,7 +36,7 @@ The official Orbit VSCode Extension provides first-class support for .orbit file
 
 ### Configuration
 
-The extension reads your project's `.orbit-analyzer.toml` file automatically. You can also configure the extension through VSCode settings:
+The extension reads your project's `.orlint.toml` file automatically. You can also configure the extension through VSCode settings:
 
 1. Open VSCode settings (Ctrl+, / Cmd+,)
 2. Search for "Orbit"
@@ -64,7 +64,7 @@ If you prefer not to use the extension, you can manually integrate Orbit Analyze
     {
       "label": "Orbit Analyzer: Lint Current File",
       "type": "shell",
-      "command": "orbit-analyzer analyze ${file}",
+      "command": "orlint analyze ${file}",
       "problemMatcher": {
         "owner": "orbit",
         "fileLocation": ["relative", "${workspaceFolder}"],
@@ -90,7 +90,7 @@ If you prefer not to use the extension, you can manually integrate Orbit Analyze
     {
       "label": "Orbit Analyzer: Lint All Files",
       "type": "shell",
-      "command": "orbit-analyzer analyze src/**/*.orbit",
+      "command": "orlint analyze src/**/*.orbit",
       "problemMatcher": {
         "owner": "orbit",
         "fileLocation": ["relative", "${workspaceFolder}"],
@@ -132,9 +132,9 @@ This will provide basic syntax highlighting even without the extension.
 
 If you encounter issues with VSCode integration:
 
-1. Make sure the `orbit-analyzer` CLI is in your PATH and works from the terminal
+1. Make sure the `orlint` CLI is in your PATH and works from the terminal
 2. Check that your .orbit files have the correct format
-3. Verify your `.orbit-analyzer.toml` configuration is valid
+3. Verify your `.orlint.toml` configuration is valid
 4. Look for error messages in the OUTPUT panel (View > Output) with "Tasks" selected
 
 ## Additional Resources

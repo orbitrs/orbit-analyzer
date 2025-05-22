@@ -39,10 +39,10 @@ jobs:
           sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
       
       - name: Install Orbit Analyzer
-        run: cargo install orbit-analyzer
+        run: cargo install orlint
       
       - name: Run Orbit Analyzer
-        run: orbit-analyzer --check src/**/*.orbit
+        run: orlint --check src/**/*.orbit
 ```
 
 ## GitLab CI
@@ -55,9 +55,9 @@ orbit-lint:
   before_script:
     - apt-get update
     - apt-get install -y libfontconfig1-dev libfreetype6-dev
-    - cargo install orbit-analyzer
+    - cargo install orlint
   script:
-    - orbit-analyzer --check src/**/*.orbit
+    - orlint --check src/**/*.orbit
 ```
 
 ## Jenkins
@@ -76,12 +76,12 @@ pipeline {
             steps {
                 sh 'apt-get update'
                 sh 'apt-get install -y libfontconfig1-dev libfreetype6-dev'
-                sh 'cargo install orbit-analyzer'
+                sh 'cargo install orlint'
             }
         }
         stage('Lint') {
             steps {
-                sh 'orbit-analyzer --check src/**/*.orbit'
+                sh 'orlint --check src/**/*.orbit'
             }
         }
     }
@@ -105,10 +105,10 @@ jobs:
           command: sudo apt-get update && sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
       - run:
           name: Install Orbit Analyzer
-          command: cargo install orbit-analyzer
+          command: cargo install orlint
       - run:
           name: Run Orbit Analyzer
-          command: orbit-analyzer --check src/**/*.orbit
+          command: orlint --check src/**/*.orbit
 
 workflows:
   version: 2
@@ -130,7 +130,7 @@ files=$(git diff --cached --name-only --diff-filter=ACM | grep '\.orbit$')
 
 if [ -n "$files" ]; then
   echo "Running Orbit Analyzer on staged .orbit files..."
-  orbit-analyzer --check $files
+  orlint --check $files
   
   if [ $? -ne 0 ]; then
     echo "Orbit Analyzer found issues. Please fix them before committing."
@@ -147,10 +147,10 @@ chmod +x .git/hooks/pre-commit
 
 ## Configuration
 
-You can customize the analyzer's behavior by creating a `.orbit-analyzer.toml` file in your project root:
+You can customize the analyzer's behavior by creating a `.orlint.toml` file in your project root:
 
 ```toml
-# .orbit-analyzer.toml
+# .orlint.toml
 
 # Specify rules to enable
 enabled_rules = [

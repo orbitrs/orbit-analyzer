@@ -70,7 +70,7 @@ function shouldValidateOnType(): boolean {
 // Get the analyzer executable path
 function getAnalyzerPath(): string {
   const config = vscode.workspace.getConfiguration('orbit.analyzer');
-  return config.get<string>('path', 'orbit-analyzer');
+  return config.get<string>('path', 'orlint');
 }
 
 // Analyze the current document
@@ -183,7 +183,7 @@ async function analyzeDocument(document: vscode.TextDocument) {
       );
       
       diagnostic.code = issue.rule;
-      diagnostic.source = 'orbit-analyzer';
+      diagnostic.source = 'orlint';
       
       diagnostics.push(diagnostic);
     }
@@ -191,7 +191,7 @@ async function analyzeDocument(document: vscode.TextDocument) {
     // Update diagnostics
     diagnosticCollection.set(document.uri, diagnostics);
   } catch (error) {
-    console.error('Error running orbit-analyzer:', error);
+    console.error('Error running orlint:', error);
   }
 }
 

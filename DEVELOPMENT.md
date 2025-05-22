@@ -9,7 +9,7 @@ This document provides information for developers working on the Orbit Analyzer 
 We provide a setup script that will configure your development environment:
 
 ```bash
-# From the orbit-analyzer directory
+# From the orlint directory
 ./scripts/setup-environment.sh
 ```
 
@@ -95,7 +95,7 @@ By removing the version specification from the git dependency, we eliminate the 
 Our CI workflow is inspired by the reusable `rust-ci.yml` workflow from the `orbit-workflows` repository but includes custom modifications to handle the orbitrs dependency:
 
 1. We create a special directory structure that mirrors our local development environment
-2. We check out both the orbit-analyzer and orbitrs repositories
+2. We check out both the orlint and orbitrs repositories
 3. We set up necessary system dependencies for building
 
 This customization ensures that:
@@ -166,15 +166,15 @@ For the release workflow to function properly, the following GitHub secrets shou
 You can run CI tests locally using the scripts from the orbit-workflows repository:
 
 ```bash
-# From the orbit-analyzer directory
+# From the orlint directory
 ../orbit-workflows/scripts/run-local-ci.sh
 ```
 
 ### Custom vs. Reusable Workflows
 
-While most repositories in the orbitrs ecosystem use the reusable workflows from the `orbit-workflows` repository directly, orbit-analyzer uses custom workflows for these reasons:
+While most repositories in the orbitrs ecosystem use the reusable workflows from the `orbit-workflows` repository directly, orlint uses custom workflows for these reasons:
 
-1. **Dependency Management**: orbit-analyzer has a direct dependency on orbitrs that requires a specific directory structure
+1. **Dependency Management**: orlint has a direct dependency on orbitrs that requires a specific directory structure
 2. **System Dependencies**: We need specific system libraries (fontconfig, freetype) for building
 3. **Multi-repository Setup**: We need to check out both repositories in a specific arrangement
 

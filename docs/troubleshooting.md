@@ -15,7 +15,7 @@ This document covers common issues you might encounter when using Orbit Analyzer
 
 ### Cargo Installation Failures
 
-**Problem**: `cargo install orbit-analyzer` fails with compilation errors.
+**Problem**: `cargo install orlint` fails with compilation errors.
 
 **Solution**:
 
@@ -25,13 +25,13 @@ This document covers common issues you might encounter when using Orbit Analyzer
 
 2. Try with specific version:
    ```bash
-   cargo install orbit-analyzer --version=0.1.9
+   cargo install orlint --version=0.1.9
    ```
 
 3. Install from source:
    ```bash
-   git clone https://github.com/orbitrs/orbit-analyzer.git
-   cd orbit-analyzer
+   git clone https://github.com/orbitrs/orlint.git
+   cd orlint
    cargo install --path .
    ```
 
@@ -68,9 +68,9 @@ For Windows, use vcpkg to install the required dependencies.
    git pull origin main
    ```
 
-2. Update the orbit-analyzer dependencies:
+2. Update the orlint dependencies:
    ```bash
-   cd ../orbit-analyzer
+   cd ../orlint
    cargo update -p orbitrs
    ```
 
@@ -86,7 +86,7 @@ For Windows, use vcpkg to install the required dependencies.
 
 **Solution**:
 
-1. Ensure the orbitrs repository is cloned as a sibling to orbit-analyzer:
+1. Ensure the orbitrs repository is cloned as a sibling to orlint:
    ```bash
    cd ..
    git clone https://github.com/orbitrs/orbitrs.git
@@ -94,7 +94,7 @@ For Windows, use vcpkg to install the required dependencies.
 
 2. Run the setup script to configure the environment:
    ```bash
-   cd orbit-analyzer
+   cd orlint
    ./scripts/setup-environment.sh
    ```
 
@@ -108,17 +108,17 @@ For Windows, use vcpkg to install the required dependencies.
 
 1. Verify the .orbit file syntax:
    ```bash
-   orbit-analyzer validate path/to/component.orbit
+   orlint validate path/to/component.orbit
    ```
 
 2. Check if you're using syntax from a newer version of Orbit than the analyzer supports:
    ```bash
-   orbit-analyzer --version
+   orlint --version
    ```
 
 3. Update to the latest version of the analyzer:
    ```bash
-   cargo install orbit-analyzer --force
+   cargo install orlint --force
    ```
 
 ### False Positives
@@ -129,13 +129,13 @@ For Windows, use vcpkg to install the required dependencies.
 
 1. Use rule suppression comments in your code:
    ```
-   <!-- orbit-analyzer-disable-next-line no-duplicate-ids -->
+   <!-- orlint-disable-next-line no-duplicate-ids -->
    <div id="intentionalDuplicate">...</div>
    ```
 
 2. Adjust your configuration to ignore specific rules:
    ```toml
-   # .orbit-analyzer.toml
+   # .orlint.toml
    [analyzer]
    disabled_rules = ["no-duplicate-ids"]
    ```
@@ -152,17 +152,17 @@ For Windows, use vcpkg to install the required dependencies.
 
 1. Use parallel analysis:
    ```bash
-   orbit-analyzer analyze --parallel path/to/components/
+   orlint analyze --parallel path/to/components/
    ```
 
 2. Use incremental analysis in CI:
    ```bash
-   orbit-analyzer analyze --incremental --git-base main path/to/components/
+   orlint analyze --incremental --git-base main path/to/components/
    ```
 
 3. Only analyze specific directories:
    ```bash
-   orbit-analyzer analyze --include "src/components/critical/**/*.orbit"
+   orlint analyze --include "src/components/critical/**/*.orbit"
    ```
 
 ### High Memory Usage
@@ -173,12 +173,12 @@ For Windows, use vcpkg to install the required dependencies.
 
 1. Process files in batches:
    ```bash
-   find src -name "*.orbit" | xargs -n 10 orbit-analyzer analyze
+   find src -name "*.orbit" | xargs -n 10 orlint analyze
    ```
 
 2. Use the `--memory-limit` option:
    ```bash
-   orbit-analyzer analyze --memory-limit 1024 path/to/components/
+   orlint analyze --memory-limit 1024 path/to/components/
    ```
 
 ## Common Rule Errors
@@ -197,7 +197,7 @@ For Windows, use vcpkg to install the required dependencies.
 
 2. Disable the rule for specific lines:
    ```
-   <!-- orbit-analyzer-disable-next-line no-duplicate-ids -->
+   <!-- orlint-disable-next-line no-duplicate-ids -->
    <div id="common">...</div>
    ```
 
@@ -235,10 +235,10 @@ For Windows, use vcpkg to install the required dependencies.
    - name: Create workspace directory
      run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
    
-   - name: Checkout orbit-analyzer
+   - name: Checkout orlint
      uses: actions/checkout@v4
      with:
-       path: orbitrs-workspace/orbit-analyzer
+       path: orbitrs-workspace/orlint
    
    - name: Checkout orbitrs
      uses: actions/checkout@v4
@@ -256,7 +256,7 @@ For Windows, use vcpkg to install the required dependencies.
 Use the `--fail-on` option to control when the analyzer should exit with a non-zero code:
 
 ```bash
-orbit-analyzer analyze --fail-on warning path/to/components/
+orlint analyze --fail-on warning path/to/components/
 ```
 
 This will cause the analyzer to exit with code 1 if any warnings or errors are found.

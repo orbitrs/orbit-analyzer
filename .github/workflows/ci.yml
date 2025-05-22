@@ -1,6 +1,6 @@
 name: CI
 
-# Improved CI workflow for orbit-analyzer with proper dependency handling
+# Improved CI workflow for orlint with proper dependency handling
 
 on:
   push:
@@ -31,16 +31,16 @@ jobs:
           mkdir -p .cargo
           echo '[workspace]' > Cargo.toml.tmp
           echo 'members = ["."]' >> Cargo.toml.tmp
-          echo '[patch."https://github.com/orbitrs/orbitrs.git"]' > .cargo/config.toml
-          echo 'orbitrs = { path = "./orbitrs_dep" }' >> .cargo/config.toml
+          echo '[patch."https://github.com/orbitrs/orbitui.git"]' > .cargo/config.toml
+          echo 'orbitui = { path = "./orbitui_dep" }' >> .cargo/config.toml
           cat Cargo.toml >> Cargo.toml.tmp
           mv Cargo.toml.tmp Cargo.toml
           
-      - name: Clone orbitrs dependency
+      - name: Clone orbitui dependency
         uses: actions/checkout@v4
         with:
-          repository: orbitrs/orbitrs
-          path: orbitrs_dep
+          repository: orbitrs/orbitui
+          path: orbitui_dep
           
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable

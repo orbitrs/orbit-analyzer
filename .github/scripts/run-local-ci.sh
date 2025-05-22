@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Run all CI checks locally for orbit-analyzer
+# Run all CI checks locally for orlint
 # Usage: ./run-local-ci.sh
 
 set -e
 
-echo "Running local CI checks for orbit-analyzer..."
+echo "Running local CI checks for orlint..."
 
 # Verify workspace setup
 echo "Verifying workspace setup..."

@@ -91,10 +91,10 @@ jobs:
       - name: Create workspace directory
         run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
       
-      - name: Checkout orbit-analyzer
+      - name: Checkout orlint
         uses: actions/checkout@v4
         with:
-          path: orbitrs-workspace/orbit-analyzer
+          path: orbitrs-workspace/orlint
       
       - name: Checkout orbitrs
         uses: actions/checkout@v4
@@ -114,17 +114,17 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
-            orbitrs-workspace/orbit-analyzer -> target
+            orbitrs-workspace/orlint -> target
             
       - name: Build documentation
-        working-directory: orbitrs-workspace/orbit-analyzer
+        working-directory: orbitrs-workspace/orlint
         run: cargo doc --no-deps --document-private-items
       
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ github.token }}
-          publish_dir: orbitrs-workspace/orbit-analyzer/target/doc
+          publish_dir: orbitrs-workspace/orlint/target/doc
           
   artifacts:
     name: Build Artifacts
@@ -155,10 +155,10 @@ jobs:
       - name: Create workspace directory
         run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
       
-      - name: Checkout orbit-analyzer
+      - name: Checkout orlint
         uses: actions/checkout@v4
         with:
-          path: orbitrs-workspace/orbit-analyzer
+          path: orbitrs-workspace/orlint
       
       - name: Checkout orbitrs
         uses: actions/checkout@v4
@@ -187,24 +187,24 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           workspaces: |
-            orbitrs-workspace/orbit-analyzer -> target
+            orbitrs-workspace/orlint -> target
           key: ${{ matrix.target }}
       
       - name: Build for ${{ matrix.name }} (native target)
         if: (!contains(matrix.target, 'aarch64') || contains(matrix.os, 'macos'))
-        working-directory: orbitrs-workspace/orbit-analyzer
+        working-directory: orbitrs-workspace/orlint
         run: cargo build --release --target ${{ matrix.target }}
       
       - name: Build for ${{ matrix.name }} (cross-platform target)
         if: contains(matrix.target, 'aarch64') && !contains(matrix.os, 'macos')
-        working-directory: orbitrs-workspace/orbit-analyzer
+        working-directory: orbitrs-workspace/orlint
         run: cross build --release --target ${{ matrix.target }}
       
       - name: Archive artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.name }}-${{ needs.prepare.outputs.version }}
-          path: orbitrs-workspace/orbit-analyzer/target/${{ matrix.target }}/release/*
+          path: orbitrs-workspace/orlint/target/${{ matrix.target }}/release/*
           if-no-files-found: error
           
   release:

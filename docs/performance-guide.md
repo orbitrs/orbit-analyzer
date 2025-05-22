@@ -28,7 +28,7 @@ Enabling parallel analysis can significantly improve performance on multi-core s
 
 ### Configuration
 
-In your `.orbit-analyzer.toml`:
+In your `.orlint.toml`:
 
 ```toml
 [performance]
@@ -38,7 +38,7 @@ parallel = true
 Or via command line:
 
 ```bash
-orbit-analyzer analyze --parallel path/to/components/
+orlint analyze --parallel path/to/components/
 ```
 
 ### Controlling Concurrency
@@ -54,7 +54,7 @@ max_concurrency = 4  # Limit to 4 parallel processes
 Or via environment variable:
 
 ```bash
-ORBIT_ANALYZER_MAX_CONCURRENCY=4 orbit-analyzer analyze --parallel path/to/components/
+ORBIT_ANALYZER_MAX_CONCURRENCY=4 orlint analyze --parallel path/to/components/
 ```
 
 ### When to Avoid Parallel Analysis
@@ -69,7 +69,7 @@ Incremental analysis only analyzes files that have changed since a baseline:
 
 ### Configuration
 
-In your `.orbit-analyzer.toml`:
+In your `.orlint.toml`:
 
 ```toml
 [performance]
@@ -80,7 +80,7 @@ git_base = "main"  # Compare against main branch
 Or via command line:
 
 ```bash
-orbit-analyzer analyze --incremental --git-base main path/to/components/
+orlint analyze --incremental --git-base main path/to/components/
 ```
 
 ### Cache Configuration
@@ -98,7 +98,7 @@ cache_dir = ".orbit-cache"
 You can also specify a manual baseline instead of using git:
 
 ```bash
-orbit-analyzer analyze --incremental --baseline previous-analysis.json path/to/components/
+orlint analyze --incremental --baseline previous-analysis.json path/to/components/
 ```
 
 ## Selective Analysis
@@ -107,7 +107,7 @@ Analyze only the files you need:
 
 ### File Filtering
 
-In your `.orbit-analyzer.toml`:
+In your `.orlint.toml`:
 
 ```toml
 [files]
@@ -118,7 +118,7 @@ exclude = ["**/test/**", "**/deprecated/**"]
 Or via command line:
 
 ```bash
-orbit-analyzer analyze --include "src/components/critical/**/*.orbit" --exclude "**/test/**" .
+orlint analyze --include "src/components/critical/**/*.orbit" --exclude "**/test/**" .
 ```
 
 ### Rule Selection
@@ -133,7 +133,7 @@ rules = ["no-duplicate-ids", "accessibility"]
 Or via command line:
 
 ```bash
-orbit-analyzer analyze --rules no-duplicate-ids,accessibility path/to/components/
+orlint analyze --rules no-duplicate-ids,accessibility path/to/components/
 ```
 
 ### Quick Mode
@@ -141,7 +141,7 @@ orbit-analyzer analyze --rules no-duplicate-ids,accessibility path/to/components
 For a fast preliminary check:
 
 ```bash
-orbit-analyzer analyze --quick path/to/components/
+orlint analyze --quick path/to/components/
 ```
 
 This runs only low-complexity rules for a faster result.
@@ -152,7 +152,7 @@ Control memory usage for large codebases:
 
 ### Memory Limits
 
-In your `.orbit-analyzer.toml`:
+In your `.orlint.toml`:
 
 ```toml
 [performance]
@@ -162,7 +162,7 @@ memory_limit = 1024  # Limit to 1024 MB
 Or via command line:
 
 ```bash
-orbit-analyzer analyze --memory-limit 1024 path/to/components/
+orlint analyze --memory-limit 1024 path/to/components/
 ```
 
 ### Batch Processing
@@ -172,14 +172,14 @@ Process files in batches:
 ```bash
 # Using zsh globbing
 for dir in src/components/*/; do
-  orbit-analyzer analyze "$dir"
+  orlint analyze "$dir"
 done
 ```
 
 Or with find:
 
 ```bash
-find src/components -name "*.orbit" -print0 | xargs -0 -n 50 orbit-analyzer analyze
+find src/components -name "*.orbit" -print0 | xargs -0 -n 50 orlint analyze
 ```
 
 ### Minimizing Rule Memory Usage
@@ -208,7 +208,7 @@ Optimize analyzer performance in CI/CD pipelines:
 - name: Run Orbit Analyzer on changed files
   if: steps.changed-files.outputs.all_changed_files
   run: |
-    orbit-analyzer analyze ${{ steps.changed-files.outputs.all_changed_files }}
+    orlint analyze ${{ steps.changed-files.outputs.all_changed_files }}
 ```
 
 ### Split Analysis Across Jobs
@@ -222,14 +222,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Analyze critical components
-        run: orbit-analyzer analyze src/components/critical/
+        run: orlint analyze src/components/critical/
 
   analyze-experimental:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Analyze experimental components
-        run: orbit-analyzer analyze src/components/experimental/
+        run: orlint analyze src/components/experimental/
 ```
 
 ### Caching
@@ -241,9 +241,9 @@ Use caching to speed up repeated analyses:
   uses: actions/cache@v3
   with:
     path: .orbit-cache
-    key: ${{ runner.os }}-orbit-analyzer-${{ hashFiles('**/*.orbit') }}
+    key: ${{ runner.os }}-orlint-${{ hashFiles('**/*.orbit') }}
     restore-keys: |
-      ${{ runner.os }}-orbit-analyzer-
+      ${{ runner.os }}-orlint-
 ```
 
 ## Benchmarking
@@ -253,13 +253,13 @@ Measure and compare analyzer performance:
 ### Basic Timing
 
 ```bash
-time orbit-analyzer analyze path/to/components/
+time orlint analyze path/to/components/
 ```
 
 ### Detailed Performance Report
 
 ```bash
-orbit-analyzer analyze --performance-report path/to/components/
+orlint analyze --performance-report path/to/components/
 ```
 
 This generates a detailed breakdown of time spent on each phase of analysis.
@@ -269,7 +269,7 @@ This generates a detailed breakdown of time spent on each phase of analysis.
 Use the benchmark helper script:
 
 ```bash
-# From the orbit-analyzer directory
+# From the orlint directory
 ./scripts/benchmark.sh --config1 config1.toml --config2 config2.toml path/to/components/
 ```
 
@@ -277,10 +277,10 @@ Use the benchmark helper script:
 
 ```bash
 # On macOS
-/usr/bin/time -l orbit-analyzer analyze path/to/components/
+/usr/bin/time -l orlint analyze path/to/components/
 
 # On Linux
-/usr/bin/time -v orbit-analyzer analyze path/to/components/
+/usr/bin/time -v orlint analyze path/to/components/
 ```
 
 ## Advanced Optimization Techniques
@@ -312,7 +312,7 @@ exclude_rules = [
 If you're only interested in specific aspects of components:
 
 ```bash
-orbit-analyzer analyze --parser-mode lightweight path/to/components/
+orlint analyze --parser-mode lightweight path/to/components/
 ```
 
 This uses a faster parser that extracts only essential information.

@@ -1,5 +1,5 @@
 {
-  "name": "orbit-analyzer-vscode",
+  "name": "orlint-vscode",
   "displayName": "Orbit UI Tools",
   "description": "VSCode extension for Orbit UI framework development",
   "version": "0.1.0",
@@ -61,8 +61,8 @@
         },
         "orbit.analyzer.path": {
           "type": "string",
-          "default": "orbit-analyzer",
-          "description": "Path to the orbit-analyzer executable"
+          "default": "orlint",
+          "description": "Path to the orlint executable"
         },
         "orbit.analyzer.rules": {
           "type": "array",
@@ -75,7 +75,7 @@
         "orbit.analyzer.configPath": {
           "type": "string",
           "default": "",
-          "description": "Path to custom .orbit-analyzer.toml configuration file"
+          "description": "Path to custom .orlint.toml configuration file"
         },
         "orbit.analyzer.validateOnSave": {
           "type": "boolean",

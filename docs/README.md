@@ -22,14 +22,14 @@ Welcome to the Orbit Analyzer documentation. This guide will help you understand
 You can install Orbit Analyzer using cargo:
 
 ```bash
-cargo install orbit-analyzer
+cargo install orlint
 ```
 
 Or clone the repository and build from source:
 
 ```bash
-git clone https://github.com/orbitrs/orbit-analyzer.git
-cd orbit-analyzer
+git clone https://github.com/orbitrs/orlint.git
+cd orlint
 cargo build --release
 ```
 
@@ -38,22 +38,22 @@ cargo build --release
 Once installed, you can run Orbit Analyzer on a single file:
 
 ```bash
-orbit-analyzer analyze path/to/component.orbit
+orlint analyze path/to/component.orbit
 ```
 
 Or analyze an entire directory of .orbit files:
 
 ```bash
-orbit-analyzer analyze path/to/components/
+orlint analyze path/to/components/
 ```
 
 ## Configuration
 
-Orbit Analyzer can be configured through a `.orbit-analyzer.toml` file in your project root or by passing command-line arguments.
+Orbit Analyzer can be configured through a `.orlint.toml` file in your project root or by passing command-line arguments.
 
 ### Configuration File
 
-Create a `.orbit-analyzer.toml` file in your project root:
+Create a `.orlint.toml` file in your project root:
 
 ```toml
 # Analyzer configuration
@@ -71,7 +71,7 @@ min_severity = "warning"
 ### Command-Line Options
 
 ```bash
-orbit-analyzer analyze --help
+orlint analyze --help
 ```
 
 Will show all available command-line options, including:
@@ -96,13 +96,13 @@ To analyze .orbit files in your project:
 
 ```bash
 # Check all .orbit files in the src directory
-orbit-analyzer --check src/**/*.orbit
+orlint --check src/**/*.orbit
 
 # Check a specific file
-orbit-analyzer --check src/components/Button.orbit
+orlint --check src/components/Button.orbit
 
 # Generate a JSON report
-orbit-analyzer --check src/**/*.orbit --format json --output report.json
+orlint --check src/**/*.orbit --format json --output report.json
 ```
 
 ### Command Line Options
@@ -117,10 +117,10 @@ orbit-analyzer --check src/**/*.orbit --format json --output report.json
 
 ## Configuration
 
-Orbit Analyzer can be configured with a `.orbit-analyzer.toml` file in your project root:
+Orbit Analyzer can be configured with a `.orlint.toml` file in your project root:
 
 ```toml
-# .orbit-analyzer.toml
+# .orlint.toml
 
 # Specify rules to enable
 enabled_rules = [
@@ -143,7 +143,7 @@ Rules can have different severity levels:
 - `warning` - A warning will be displayed, but the build will not fail
 - `info` - Informational messages will be displayed
 
-You can configure severity levels in your `.orbit-analyzer.toml`:
+You can configure severity levels in your `.orlint.toml`:
 
 ```toml
 [rule_severity]
@@ -166,4 +166,4 @@ For more detailed information, check out the [Custom Lint Rules](custom-lint-rul
 
 ## Integration with Continuous Integration
 
-For instructions on how to integrate `orbit-analyzer` with your CI/CD pipeline and handle monorepo dependencies, see the [Monorepo CI Guide](./monorepo-ci-guide.md).
+For instructions on how to integrate `orlint` with your CI/CD pipeline and handle monorepo dependencies, see the [Monorepo CI Guide](./monorepo-ci-guide.md).

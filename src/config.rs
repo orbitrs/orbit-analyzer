@@ -1,5 +1,5 @@
 // Configuration handler for Orbit Analyzer
-// Parses and manages the .orbit-analyzer.toml configuration file
+// Parses and manages the .orlint.toml configuration file
 
 use crate::reporter::Severity;
 use serde::{Deserialize, Serialize};
@@ -202,7 +202,7 @@ impl Config {
         let mut current_dir = std::env::current_dir()?;
 
         loop {
-            let config_path = current_dir.join(".orbit-analyzer.toml");
+            let config_path = current_dir.join(".orlint.toml");
             if config_path.exists() {
                 return Self::from_file(config_path);
             }

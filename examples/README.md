@@ -7,22 +7,22 @@ This directory contains example `.orbit` component files that demonstrate the ca
 - `Button.orbit`: A well-structured component following best practices
 - `BadComponent.orbit`: A component with various issues that the analyzer will detect
 - `RendererSpecific.orbit`: A component showcasing renderer-specific features
-- `.orbit-analyzer.toml`: Sample configuration file for the analyzer
+- `.orlint.toml`: Sample configuration file for the analyzer
 
 ## Running the Analyzer
 
 To analyze these examples with the default configuration:
 
 ```bash
-# From the orbit-analyzer directory
+# From the orlint directory
 cargo run -- analyze examples/**/*.orbit
 ```
 
 To use the sample configuration:
 
 ```bash
-# From the orbit-analyzer directory
-cargo run -- analyze --config examples/.orbit-analyzer.toml examples/**/*.orbit
+# From the orlint directory
+cargo run -- analyze --config examples/.orlint.toml examples/**/*.orbit
 ```
 
 ## Expected Results

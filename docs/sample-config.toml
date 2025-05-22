@@ -1,5 +1,5 @@
 # Sample Orbit Analyzer configuration
-# Save this as .orbit-analyzer.toml in your project root
+# Save this as .orlint.toml in your project root
 
 # Core analyzer configuration
 [analyzer]

@@ -1,6 +1,6 @@
 # CI/CD Improvements Documentation
 
-This document outlines the improvements made to the CI/CD workflows for the orbit-analyzer project.
+This document outlines the improvements made to the CI/CD workflows for the orlint project.
 
 ## Overview of Changes
 
@@ -64,4 +64,4 @@ The improved release workflow includes:
 
 ## Conclusion
 
-These CI/CD improvements will help maintain code quality, speed up development cycles, and make the release process more reliable for the orbit-analyzer project.
+These CI/CD improvements will help maintain code quality, speed up development cycles, and make the release process more reliable for the orlint project.

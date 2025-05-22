@@ -1,4 +1,4 @@
-// New rule implementation for the orbit-analyzer
+// New rule implementation for the orlint
 // These rules enhance the analyzer's capabilities for static code analysis
 
 use crate::reporter::{Issue, Severity};

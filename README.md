@@ -1,9 +1,9 @@
 # Orbit Analyzer
 
-![CI Status](https://github.com/orbitrs/orbit-analyzer/actions/workflows/ci.yml/badge.svg)
-![Release Status](https://github.com/orbitrs/orbit-analyzer/actions/workflows/release.yml/badge.svg)
-[![codecov](https://codecov.io/gh/orbitrs/orbit-analyzer/branch/main/graph/badge.svg?token=CODECOV_TOKEN)](https://codecov.io/gh/orbitrs/orbit-analyzer)
-[![crates.io](https://img.shields.io/crates/v/orbit-analyzer.svg)](https://crates.io/crates/orbit-analyzer)
+![CI Status](https://github.com/orbitrs/orlint/actions/workflows/ci.yml/badge.svg)
+![Release Status](https://github.com/orbitrs/orlint/actions/workflows/release.yml/badge.svg)
+[![codecov](https://codecov.io/gh/orbitrs/orlint/branch/main/graph/badge.svg?token=CODECOV_TOKEN)](https://codecov.io/gh/orbitrs/orlint)
+[![crates.io](https://img.shields.io/crates/v/orlint.svg)](https://crates.io/crates/orlint)
 
 ## 📖 Project Overview
 
@@ -86,8 +86,8 @@ For detailed documentation on using and extending Orbit Analyzer, check out our 
 ### Installation
 
 ```bash
-git clone https://github.com/orbitrs/orbit-analyzer.git
-cd orbit-analyzer
+git clone https://github.com/orbitrs/orlint.git
+cd orlint
 cargo build --release
 ```
 
@@ -96,20 +96,20 @@ cargo build --release
 Analyze your Orbit project:
 
 ```bash
-./target/release/orbit-analyzer path/to/your/components
+./target/release/orlint path/to/your/components
 ```
 
 Generate a JSON report:
 
 ```bash
-./target/release/orbit-analyzer --output report.json path/to/your/components
+./target/release/orlint --output report.json path/to/your/components
 ```
 
 ---
 
 ## ⚙️ Configuration
 
-Use a configuration file `.orbit-analyzer.toml` to customize behavior:
+Use a configuration file `.orlint.toml` to customize behavior:
 
 ```toml
 [settings]
@@ -170,7 +170,7 @@ We welcome contributions from the community!
 ## 📞 Contact & Support
 
 For questions, feature requests, or support, please open an issue on the GitHub repository:
-[https://github.com/orbitrs/orbit-analyzer/issues](https://github.com/orbitrs/orbit-analyzer/issues)
+[https://github.com/orbitrs/orlint/issues](https://github.com/orbitrs/orlint/issues)
 
 ---
 

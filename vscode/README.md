@@ -27,7 +27,7 @@ Visual Studio Code extension for Orbit UI framework development. This extension 
 
 ### Manual Installation
 
-1. Download the `.vsix` file from the [latest release](https://github.com/orbitrs/orbit-analyzer/releases)
+1. Download the `.vsix` file from the [latest release](https://github.com/orbitrs/orlint/releases)
 2. Open VS Code
 3. Go to Extensions view
 4. Click on the "..." menu in the top-right corner
@@ -41,7 +41,7 @@ This extension can be configured through VS Code settings:
 ```json
 {
   "orbit.analyzer.enable": true,
-  "orbit.analyzer.path": "orbit-analyzer",
+  "orbit.analyzer.path": "orlint",
   "orbit.analyzer.rules": [], // Empty array = use all rules
   "orbit.analyzer.configPath": "", // Path to custom config file
   "orbit.analyzer.validateOnSave": true,
@@ -68,8 +68,8 @@ To build this extension from source:
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/orbitrs/orbit-analyzer.git
-   cd orbit-analyzer/vscode
+   git clone https://github.com/orbitrs/orlint.git
+   cd orlint/vscode
    ```
 
 2. Install dependencies:

@@ -1,16 +1,16 @@
 [package]
-name = "orbit-analyzer"
+name = "orlint"
 version = "0.1.0"
 edition = "2021"
 authors = ["Orbit Team <orbit@example.com>"]
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/orbitrs/orbit-analyzer"
+repository = "https://github.com/orbitrs/orlint"
 readme = "README.md"
 description = "Static analysis tool for Orbit UI framework files"
 
 [dependencies]
 # Core dependencies
-orbitrs = { workspace = true }
+orbitui = { workspace = true }
 
 # Parser libraries
 syn = { version = "2.0", features = ["full", "extra-traits"] }
@@ -40,7 +40,7 @@ name = "orbit_analyzer"
 path = "src/lib.rs"
 
 [[bin]]
-name = "orbit-analyzer"
+name = "orlint"
 path = "src/main.rs"
 
 [dev-dependencies]

@@ -1,4 +1,4 @@
-// Main entry point for the orbit-analyzer CLI
+// Main entry point for the orlint CLI
 
 use clap::{Args, Parser, Subcommand};
 use orbit_analyzer::{analyze_files_with_config, Config, Reporter, Severity, VERSION};
@@ -7,7 +7,7 @@ use std::process;
 
 #[derive(Parser)]
 #[command(author, version = VERSION, about, long_about = None)]
-#[command(name = "orbit-analyzer")]
+#[command(name = "orlint")]
 #[command(about = "Static analysis tool for Orbit UI framework files")]
 struct Cli {
     #[command(subcommand)]
@@ -209,7 +209,7 @@ fn validate_command(args: ValidateArgs) -> Result<(), Box<dyn std::error::Error>
 
 /// Execute the list-rules command
 fn list_rules_command() -> Result<(), Box<dyn std::error::Error>> {
-    println!("Available rules in orbit-analyzer:");
+    println!("Available rules in orlint:");
 
     let rules = [
         (

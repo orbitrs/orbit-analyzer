@@ -1,4 +1,4 @@
-// Parser for orbit-analyzer
+// Parser for orlint
 
 use crate::AnalyzerError;
 use crate::Result;

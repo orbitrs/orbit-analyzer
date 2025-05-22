@@ -8,19 +8,19 @@ Orbit Analyzer provides several commands for different use cases:
 
 ```bash
 # Basic analysis
-orbit-analyzer analyze [options] <path>
+orlint analyze [options] <path>
 
 # Validate file syntax only
-orbit-analyzer validate [options] <path>
+orlint validate [options] <path>
 
 # Generate a configuration file
-orbit-analyzer init [options]
+orlint init [options]
 
 # List available rules
-orbit-analyzer list-rules
+orlint list-rules
 
 # Show version information
-orbit-analyzer --version
+orlint --version
 ```
 
 ## Analysis Command
@@ -28,7 +28,7 @@ orbit-analyzer --version
 The `analyze` command is the main entry point for analyzing Orbit components:
 
 ```bash
-orbit-analyzer analyze [options] <path>
+orlint analyze [options] <path>
 ```
 
 ### Options
@@ -53,32 +53,32 @@ orbit-analyzer analyze [options] <path>
 
 Basic analysis of a single file:
 ```bash
-orbit-analyzer analyze src/components/Button.orbit
+orlint analyze src/components/Button.orbit
 ```
 
 Analyze an entire directory:
 ```bash
-orbit-analyzer analyze src/components/
+orlint analyze src/components/
 ```
 
 Use specific rules:
 ```bash
-orbit-analyzer analyze --rules no-duplicate-ids,use-state-properly src/components/
+orlint analyze --rules no-duplicate-ids,use-state-properly src/components/
 ```
 
 Output in JSON format:
 ```bash
-orbit-analyzer analyze --format json src/components/ > analysis-report.json
+orlint analyze --format json src/components/ > analysis-report.json
 ```
 
 Exclude specific files:
 ```bash
-orbit-analyzer analyze --exclude "**/deprecated/**" src/components/
+orlint analyze --exclude "**/deprecated/**" src/components/
 ```
 
 Only analyze files that have changed since the main branch:
 ```bash
-orbit-analyzer analyze --incremental --git-base main src/components/
+orlint analyze --incremental --git-base main src/components/
 ```
 
 ## Validate Command
@@ -86,7 +86,7 @@ orbit-analyzer analyze --incremental --git-base main src/components/
 The `validate` command performs a syntax check only:
 
 ```bash
-orbit-analyzer validate [options] <path>
+orlint validate [options] <path>
 ```
 
 ### Options
@@ -101,12 +101,12 @@ orbit-analyzer validate [options] <path>
 
 Validate a single file:
 ```bash
-orbit-analyzer validate src/components/Button.orbit
+orlint validate src/components/Button.orbit
 ```
 
 Validate all components:
 ```bash
-orbit-analyzer validate src/components/
+orlint validate src/components/
 ```
 
 ## Init Command
@@ -114,7 +114,7 @@ orbit-analyzer validate src/components/
 The `init` command generates a default configuration file:
 
 ```bash
-orbit-analyzer init [options]
+orlint init [options]
 ```
 
 ### Options
@@ -128,12 +128,12 @@ orbit-analyzer init [options]
 
 Create a configuration file in the current directory:
 ```bash
-orbit-analyzer init
+orlint init
 ```
 
 Create a configuration file in a specific directory:
 ```bash
-orbit-analyzer init --path src/
+orlint init --path src/
 ```
 
 ## List-Rules Command
@@ -141,7 +141,7 @@ orbit-analyzer init --path src/
 The `list-rules` command shows all available linting rules:
 
 ```bash
-orbit-analyzer list-rules [options]
+orlint list-rules [options]
 ```
 
 ### Options
@@ -155,12 +155,12 @@ orbit-analyzer list-rules [options]
 
 List all available rules:
 ```bash
-orbit-analyzer list-rules
+orlint list-rules
 ```
 
 List rules as JSON:
 ```bash
-orbit-analyzer list-rules --format json
+orlint list-rules --format json
 ```
 
 ## Environment Variables
@@ -185,7 +185,7 @@ Orbit Analyzer respects the following environment variables:
 
 ## Configuration File
 
-The Orbit Analyzer uses a TOML configuration file. By default, it looks for `.orbit-analyzer.toml` in the current directory or any parent directory.
+The Orbit Analyzer uses a TOML configuration file. By default, it looks for `.orlint.toml` in the current directory or any parent directory.
 
 Example configuration:
 

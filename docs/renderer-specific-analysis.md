@@ -232,7 +232,7 @@ impl Rule for CustomSkiaRule {
 
 ## Configuring Renderer Rules
 
-You can enable or disable specific renderer rules in your `.orbit-analyzer.toml` configuration:
+You can enable or disable specific renderer rules in your `.orlint.toml` configuration:
 
 ```toml
 [analyzer.renderers]
@@ -251,11 +251,11 @@ cross_renderer = { exclude = ["renderer-fallback-support"] }
 To run only renderer-specific checks:
 
 ```bash
-orbit-analyzer analyze --renderer skia src/components/
+orlint analyze --renderer skia src/components/
 ```
 
 To analyze for compatibility with multiple renderers:
 
 ```bash
-orbit-analyzer analyze --renderers skia,webgpu src/components/
+orlint analyze --renderers skia,webgpu src/components/
 ```
