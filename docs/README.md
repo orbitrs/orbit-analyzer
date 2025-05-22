@@ -163,3 +163,7 @@ A typical workflow for using Orbit Analyzer includes:
 5. Create custom rules as needed for your specific requirements
 
 For more detailed information, check out the [Custom Lint Rules](custom-lint-rules.md) documentation and [CI Integration](ci-integration.md) guide.
+
+## Integration with Continuous Integration
+
+For instructions on how to integrate `orbit-analyzer` with your CI/CD pipeline and handle monorepo dependencies, see the [Monorepo CI Guide](./monorepo-ci-guide.md).

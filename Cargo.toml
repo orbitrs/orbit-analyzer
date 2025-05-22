@@ -42,3 +42,6 @@ path = "src/lib.rs"
 [[bin]]
 name = "orbit-analyzer"
 path = "src/main.rs"
+
+[dev-dependencies]
+criterion = "0.5"

@@ -220,14 +220,14 @@ jobs:
   analyze-critical:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Analyze critical components
         run: orbit-analyzer analyze src/components/critical/
 
   analyze-experimental:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Analyze experimental components
         run: orbit-analyzer analyze src/components/experimental/
 ```
