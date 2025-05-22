@@ -141,7 +141,7 @@ jobs:
         run: |
           # Add a build.rs file to ensure proper linking of Windows libraries if it doesn't exist
           if [ ! -f "build.rs" ]; then
-            cat > build.rs << 'EOL'
+            cat > build.rs << 'EOLBUILD'
             // This build script ensures that advapi32.lib is properly linked on Windows
             // which is needed by the Skia ICU library for Registry API functions
 
@@ -156,12 +156,12 @@ jobs:
                     println!("cargo:rustc-link-search=native=C:\\Windows\\System32");
                 }
             }
-            EOL
+            EOLBUILD
           fi
           
           # Create a Windows helper batch file
           mkdir -p scripts
-          cat > scripts/windows-setup.bat << 'EOL'
+          cat > scripts/windows-setup.bat << 'EOLBAT'
           @echo off
           REM Helper script to ensure proper linking of Windows libraries
           REM This addresses the missing advapi32.lib issue with Skia ICU
@@ -180,7 +180,7 @@ jobs:
           echo Updated LIB environment variable
 
           exit /b 0
-          EOL
+          EOLBAT
           
           # Create .cargo/config.toml with correct Windows linker settings in the dependency repo too
           mkdir -p orbitrs_dep/.cargo
@@ -188,7 +188,7 @@ jobs:
           echo 'rustflags = ["-C", "link-arg=/DEFAULTLIB:advapi32.lib"]' >> orbitrs_dep/.cargo/config.toml
           
           # Create build.rs for orbitrs dependency as well
-          cat > orbitrs_dep/build.rs << 'EOL'
+          cat > orbitrs_dep/build.rs << 'EOLDEP'
           // This build script ensures all required libraries are properly linked
           // It's particularly important for Windows where advapi32.lib is needed for the Skia ICU library
 
@@ -205,7 +205,7 @@ jobs:
               
               // Add any future platform-specific dependencies here
           }
-          EOL
+          EOLDEP
         shell: bash
       
       # Configure Windows dependencies to address the Registry API issue
