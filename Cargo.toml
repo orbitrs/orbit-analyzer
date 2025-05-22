@@ -10,7 +10,7 @@ description = "Static analysis tool for Orbit UI framework files"
 
 [dependencies]
 # Core dependencies
-orbitrs = { git = "https://github.com/orbitrs/orbitrs.git", branch = "main" }
+orbitrs = { path = "../orbitrs", version = "0.1.0" }
 
 # Parser libraries
 syn = { version = "2.0", features = ["full", "extra-traits"] }
@@ -48,4 +48,4 @@ criterion = "0.5"
 
 # Patch sections to override dependency sources in different environments
 [patch."https://github.com/orbitrs/orbitrs.git"]
-orbitrs = { path = "../orbitrs" }
+orbitrs = { path = "../orbitrs", optional = true }
