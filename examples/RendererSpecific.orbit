@@ -1,0 +1,50 @@
+<template>
+  <!-- Renderer metadata tag -->
+  <div renderer="webgpu" fallback="skia">
+    <canvas class="render-target" width="800" height="600" webgpu:compute-shaders="true">
+      <!-- WebGPU-specific content -->
+    </canvas>
+  </div>
+</template>
+
+<script>
+component RendererSpecific {
+  props {
+    shader: string;
+    antialiasing: boolean = true;
+    renderMode: "2d" | "3d" = "2d";
+  }
+
+  state {
+    isInitialized: boolean = false;
+    frameCount: number = 0;
+  }
+
+  mounted() {
+    this.initialize();
+  }
+
+  initialize() {
+    // Initialize renderer
+    this.isInitialized = true;
+    console.log(`Initialized ${this.renderMode} renderer with shader: ${this.shader}`);
+  }
+
+  renderFrame() {
+    if (!this.isInitialized) {
+      return;
+    }
+    
+    this.frameCount += 1;
+    // Rendering code would go here
+  }
+}
+</script>
+
+<style>
+.render-target {
+  width: 100%;
+  height: 100%;
+  background-color: black;
+}
+</style>

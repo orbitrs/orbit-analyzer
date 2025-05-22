@@ -1,0 +1,127 @@
+{
+  "name": "orbit-analyzer-vscode",
+  "displayName": "Orbit UI Tools",
+  "description": "VSCode extension for Orbit UI framework development",
+  "version": "0.1.0",
+  "publisher": "orbitrs",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Formatters"
+  ],
+  "keywords": [
+    "orbit",
+    "orbitrs",
+    "linting",
+    "analyzer",
+    "ui"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "orbit",
+        "aliases": [
+          "Orbit",
+          "orbit"
+        ],
+        "extensions": [
+          ".orbit"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "orbit",
+        "scopeName": "source.orbit",
+        "path": "./syntaxes/orbit.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "orbit.analyzer.analyzeCurrentFile",
+        "title": "Orbit: Analyze Current File"
+      },
+      {
+        "command": "orbit.analyzer.analyzeWorkspace",
+        "title": "Orbit: Analyze Workspace"
+      }
+    ],
+    "configuration": {
+      "title": "Orbit UI",
+      "properties": {
+        "orbit.analyzer.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable/disable Orbit Analyzer integration"
+        },
+        "orbit.analyzer.path": {
+          "type": "string",
+          "default": "orbit-analyzer",
+          "description": "Path to the orbit-analyzer executable"
+        },
+        "orbit.analyzer.rules": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "Rules to enable (empty array = enable all)"
+        },
+        "orbit.analyzer.configPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to custom .orbit-analyzer.toml configuration file"
+        },
+        "orbit.analyzer.validateOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run analyzer when saving .orbit files"
+        },
+        "orbit.analyzer.validateOnType": {
+          "type": "boolean",
+          "default": false,
+          "description": "Run analyzer as you type (may affect performance)"
+        },
+        "orbit.analyzer.severities": {
+          "type": "object",
+          "default": {},
+          "description": "Rule severity overrides",
+          "additionalProperties": {
+            "type": "string",
+            "enum": [
+              "error",
+              "warning",
+              "info",
+              "none"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.1",
+    "@typescript-eslint/parser": "^6.13.1",
+    "eslint": "^8.54.0",
+    "ts-loader": "^9.5.2",
+    "typescript": "^5.3.2",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

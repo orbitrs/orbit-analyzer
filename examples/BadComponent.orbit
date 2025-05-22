@@ -1,0 +1,30 @@
+<template>
+  <div>
+    <!-- Empty container with no semantic meaning -->
+  </div>
+</template>
+
+<script>
+component badComponent {
+  // Missing type annotations for props
+  props {
+    title;
+    items;
+  }
+
+  // Missing type and initial value for state
+  state {
+    count;
+  }
+
+  // No public methods defined
+}
+</script>
+
+<style>
+/* Skia-specific features that won't work with WebGPU */
+.container {
+  skia:filter: blur(5px);
+  canvas-composite: multiply;
+}
+</style>

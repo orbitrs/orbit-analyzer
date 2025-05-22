@@ -25,10 +25,38 @@ Orbit Analyzer enables deeper insights into your codebase by combining syntax ch
 * **Renderer-Aware Analysis:** 
     * Validate component metadata for renderer preferences (Skia/WGPU).
     * Check for optimal usage of renderer-specific features.
-* **Code Metrics:** Calculate complexity, size, and other useful metrics.
 * **Custom Lint Rules:** Easily add or modify linting rules, including renderer-specific ones.
+* **Code Quality Enforcement:**
+    * Component naming conventions
+    * Type checking for props and state
+    * State initialization verification
+    * Public method requirements
+* **Multiple Output Formats:**
+    * Text console output
+    * JSON for programmatic consumption
+    * HTML reports with issue visualization
+* **Performance Features:**
+    * Parallel analysis for large codebases
+    * Configurable severity levels
+    * Rule filtering options
+* **IDE Integration:**
+    * VSCode extension for real-time linting
+    * Syntax highlighting for `.orbit` files
+    * Quick fixes for common issues
 * **Cross-platform CLI:** Command-line interface for easy integration and usage.
-* **Detailed Reports:** Generate human-readable and machine-readable analysis reports.
+
+## 🧩 Development
+
+For information about setting up the project for development, dependency management, and contributing, see the [Development Guide](DEVELOPMENT.md).
+
+## 📚 Documentation
+
+For detailed documentation on using and extending Orbit Analyzer, check out our [Documentation](docs/README.md), which includes:
+
+* [Creating Custom Lint Rules](docs/custom-lint-rules.md)
+* [CI Integration Guide](docs/ci-integration.md)
+
+---
 * **WASM Support:** Potential to run analysis in-browser or in other WASM environments.
 
 ---
@@ -144,6 +172,12 @@ For questions, feature requests, or support, please open an issue on the GitHub 
 ## 🧩 Development
 
 For information about setting up the project for development, dependency management, and contributing, see the [Development Guide](DEVELOPMENT.md).
+
+## 📚 Documentation
+
+- [Getting Started](docs/README.md)
+- [Custom Lint Rules](docs/custom-lint-rules.md)
+- [CI Integration](docs/ci-integration.md)
 
 ---
 

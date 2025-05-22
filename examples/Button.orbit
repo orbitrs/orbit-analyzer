@@ -1,0 +1,75 @@
+<template>
+  <div class="button-container">
+    <button @click="handleClick" :class="{ 'primary': isPrimary, 'disabled': isDisabled }">
+      {{ label }}
+    </button>
+  </div>
+</template>
+
+<script>
+component Button {
+  // Props with type annotations and default values
+  props {
+    label: string = "Click Me";
+    isPrimary: boolean = true;
+    isDisabled: boolean = false;
+    onClick: () => void = () => {};
+  }
+
+  // State variables with type annotations
+  state {
+    clickCount: number = 0;
+    lastClickTime: number | null = null;
+  }
+
+  // Component lifecycle method
+  mounted() {
+    console.log("Button component mounted");
+  }
+
+  // Event handler with proper typing
+  handleClick() {
+    if (this.isDisabled) {
+      return;
+    }
+    
+    this.clickCount += 1;
+    this.lastClickTime = Date.now();
+    this.onClick();
+  }
+
+  // Accessor method
+  getClickCount(): number {
+    return this.clickCount;
+  }
+}
+</script>
+
+<style>
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #ccc;
+  background-color: #f5f5f5;
+}
+
+button.primary {
+  background-color: #0066cc;
+  color: white;
+  border-color: #0055aa;
+}
+
+button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+</style>

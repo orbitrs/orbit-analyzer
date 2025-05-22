@@ -1,5 +1,8 @@
 name: CI
 
+# This workflow follows the structure of the reusable rust-ci.yml workflow
+# but includes custom steps to handle the orbitrs dependency
+
 on:
   push:
     branches: [ main ]
@@ -13,8 +16,8 @@ permissions:
   id-token: write # This is required for requesting the JWT
 
 jobs:
-  ci:
-    name: Run CI
+  check:
+    name: Format & Lint
     runs-on: ubuntu-latest
     steps:
       # Create a directory structure that matches our local development environment
@@ -69,6 +72,51 @@ jobs:
         working-directory: orbitrs-workspace/orbit-analyzer
         run: cargo clippy --all-targets --all-features -- -D warnings
         
+  test:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    needs: check
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-latest
+            target: x86_64-apple-darwin
+    steps:
+      - name: Create workspace directory
+        run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
+      
+      - name: Checkout orbit-analyzer
+        uses: actions/checkout@v4
+        with:
+          path: orbitrs-workspace/orbit-analyzer
+      
+      - name: Checkout orbitrs
+        uses: actions/checkout@v4
+        with:
+          repository: orbitrs/orbitrs
+          path: orbitrs-workspace/orbitrs
+      
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      
+      - name: Install system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+      
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            orbitrs-workspace/orbit-analyzer -> target
+            
       - name: Run tests
         working-directory: orbitrs-workspace/orbit-analyzer
         run: cargo test --all-features

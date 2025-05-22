@@ -1,5 +1,8 @@
 name: Release
 
+# This workflow follows the structure of the reusable rust-release.yml workflow
+# but includes custom steps to handle the orbitrs dependency
+
 on:
   push:
     tags:
@@ -23,17 +26,180 @@ on:
         default: false
 
 permissions:
-  contents: read
+  contents: write
   actions: read
   pull-requests: read
   id-token: write # This is required for requesting the JWT
 
 jobs:
+  # We implement our own release process instead of using the reusable workflow
+  # to properly handle our dependencies on orbitrs
+  prepare:
+    name: Prepare Release
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      changelog: ${{ steps.changelog.outputs.content }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+        with:
+          fetch-depth: 0
+      
+      - name: Get version
+        id: version
+        run: echo "version=$(cargo metadata --no-deps --format-version=1 | jq -r '.packages[0].version')" >> $GITHUB_OUTPUT
+      
+      - name: Extract Changelog
+        id: changelog
+        uses: ffurrer2/extract-release-notes@v1
+        with:
+          filename: CHANGELOG.md
+        
+  publish:
+    name: Publish to crates.io
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish-crate || github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Publish to crates.io
+        run: cargo publish --token ${{ secrets.CRATES_TOKEN }}
+        
+  docs:
+    name: Build & Publish Docs
+    runs-on: ubuntu-latest
+    needs: prepare
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.build-docs || github.event_name == 'push' }}
+    steps:
+      - name: Create workspace directory
+        run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
+      
+      - name: Checkout orbit-analyzer
+        uses: actions/checkout@v4
+        with:
+          path: orbitrs-workspace/orbit-analyzer
+      
+      - name: Checkout orbitrs
+        uses: actions/checkout@v4
+        with:
+          repository: orbitrs/orbitrs
+          path: orbitrs-workspace/orbitrs
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+      
+      - name: Build documentation
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: cargo doc --no-deps --document-private-items
+      
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ github.token }}
+          publish_dir: orbitrs-workspace/orbit-analyzer/target/doc
+          
+  artifacts:
+    name: Build Artifacts
+    runs-on: ${{ matrix.os }}
+    needs: prepare
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.cross-platform-artifacts || github.event_name == 'push' }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            name: linux-x86_64
+          - os: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            name: linux-arm64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            name: windows-x86_64
+          - os: macos-latest
+            target: x86_64-apple-darwin
+            name: macos-x86_64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            name: macos-arm64
+    steps:
+      - name: Create workspace directory
+        run: mkdir -p $GITHUB_WORKSPACE/orbitrs-workspace
+      
+      - name: Checkout orbit-analyzer
+        uses: actions/checkout@v4
+        with:
+          path: orbitrs-workspace/orbit-analyzer
+      
+      - name: Checkout orbitrs
+        uses: actions/checkout@v4
+        with:
+          repository: orbitrs/orbitrs
+          path: orbitrs-workspace/orbitrs
+      
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      
+      - name: Install cross (for non-native targets)
+        if: contains(matrix.target, 'aarch64') && !contains(matrix.os, 'macos')
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cross
+          
+      - name: Install system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+      
+      - name: Build for ${{ matrix.name }} (native target)
+        if: (!contains(matrix.target, 'aarch64') || contains(matrix.os, 'macos'))
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: cargo build --release --target ${{ matrix.target }}
+      
+      - name: Build for ${{ matrix.name }} (cross-platform target)
+        if: contains(matrix.target, 'aarch64') && !contains(matrix.os, 'macos')
+        working-directory: orbitrs-workspace/orbit-analyzer
+        run: cross build --release --target ${{ matrix.target }}
+      
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.name }}-${{ needs.prepare.outputs.version }}
+          path: orbitrs-workspace/orbit-analyzer/target/${{ matrix.target }}/release/*
+          if-no-files-found: error
+          
   release:
-    uses: orbitrs/orbit-workflows/.github/workflows/rust-release.yml@main
-    with:
-      publish-crate: ${{ github.event_name == 'workflow_dispatch' && inputs.publish-crate || github.event_name == 'push' }}
-      build-docs: ${{ github.event_name == 'workflow_dispatch' && inputs.build-docs || github.event_name == 'push' }}
-      cross-platform-artifacts: ${{ github.event_name == 'workflow_dispatch' && inputs.cross-platform-artifacts || github.event_name == 'push' }}
-    secrets:
-      CRATES_TOKEN: ${{ secrets.CRATES_TOKEN }}
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [prepare, artifacts]
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.cross-platform-artifacts || github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ needs.prepare.outputs.version }}
+          name: Release v${{ needs.prepare.outputs.version }}
+          body: ${{ needs.prepare.outputs.changelog }}
+          files: artifacts/**/*
+          draft: false
+          prerelease: false

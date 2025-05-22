@@ -1,4 +1,11 @@
-// Rules for checking .orbit files
+// Rules module definition
+// This file organizes all rules into a modular structure
+
+mod component_rules;
+
+pub use component_rules::{
+    ComponentNamingRule, PropTypeRule, RendererCompatibilityRule, StateVariableRule,
+};
 
 use crate::reporter::Issue;
 use orbitrs::parser::OrbitAst;

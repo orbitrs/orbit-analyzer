@@ -1,0 +1,91 @@
+# Sample Orbit Analyzer configuration
+# Save this as .orbit-analyzer.toml in your project root
+
+# Core analyzer configuration
+[analyzer]
+# Rules to check (uncomment and modify as needed)
+rules = [
+  # General rules
+  "no-duplicate-ids",
+  "use-state-properly",
+  "proper-event-handling",
+  "accessibility",
+  
+  # Renderer-specific rules
+  "renderer-compatibility",
+  "skia-path-optimization",
+  "webgpu-shader-compatibility"
+]
+
+# Rules to exclude
+exclude_rules = [
+  # "experimental-features"
+]
+
+# Report format (text, json, html)
+format = "text"
+
+# Minimum severity to report (error, warning, info)
+min_severity = "warning"
+
+# Minimum severity to cause non-zero exit code
+fail_on = "error"
+
+# Renderer-specific rule configurations
+[analyzer.renderers]
+# Enable Skia-specific rules
+skia = true
+
+# Enable WebGPU-specific rules
+webgpu = true
+
+# Enable cross-renderer compatibility rules
+cross_renderer = true
+
+# File patterns
+[files]
+# Include patterns
+include = ["**/*.orbit"]
+
+# Exclude patterns
+exclude = [
+  "**/node_modules/**",
+  "**/dist/**",
+  "**/deprecated/**",
+  "**/.orbit-cache/**"
+]
+
+# Performance settings
+[performance]
+# Enable parallel analysis
+parallel = true
+
+# Enable incremental analysis
+incremental = false
+
+# Git branch to compare against for incremental analysis
+git_base = "main"
+
+# Memory limit in MB (0 = unlimited)
+memory_limit = 0
+
+# Custom rule configurations
+[rules.accessibility]
+# Check for missing alt attributes on images
+check_alt_attributes = true
+
+# Check for proper ARIA roles
+check_aria_roles = true
+
+# Check for color contrast
+check_color_contrast = false
+
+[rules.renderer-compatibility]
+# List of renderers to check compatibility with
+renderers = ["skia", "webgpu"]
+
+# Custom severity overrides for specific rules
+[severity]
+"no-duplicate-ids" = "error"
+"accessibility" = "warning"
+"experimental-features" = "info"
