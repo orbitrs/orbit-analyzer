@@ -9,7 +9,13 @@
       "include": "#script-section"
     },
     {
+      "include": "#code-section"
+    },
+    {
       "include": "#style-section"
+    },
+    {
+      "include": "#markdown-section"
     }
   ],
   "repository": {
@@ -104,6 +110,74 @@
       "contentName": "source.css",
       "patterns": [
         { "include": "source.css" }
+      ]
+    },
+    "code-section": {
+      "begin": "(<)(code)\\s+lang=\"(rust)\"(>)",
+      "end": "(</)(code)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.code.orbit" },
+        "3": { "name": "entity.other.attribute-name.orbit" },
+        "4": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.code.orbit" },
+        "3": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "contentName": "source.rust",
+      "patterns": [
+        {
+          "begin": "component\\s+([A-Za-z_][A-Za-z0-9_]*)\\s*\\{",
+          "beginCaptures": {
+            "0": { "name": "keyword.other.component.orbit" },
+            "1": { "name": "entity.name.type.component.orbit" }
+          },
+          "end": "\\}",
+          "patterns": [
+            {
+              "begin": "props\\s*\\{",
+              "beginCaptures": {
+                "0": { "name": "keyword.other.props.orbit" }
+              },
+              "end": "\\}",
+              "patterns": [
+                { "include": "source.rust" }
+              ]
+            },
+            {
+              "begin": "state\\s*\\{",
+              "beginCaptures": {
+                "0": { "name": "keyword.other.state.orbit" }
+              },
+              "end": "\\}",
+              "patterns": [
+                { "include": "source.rust" }
+              ]
+            },
+            { "include": "source.rust" }
+          ]
+        },
+        { "include": "source.rust" }
+      ]
+    },
+    "markdown-section": {
+      "begin": "(<)(markdown)(>)",
+      "end": "(</)(markdown)(>)",
+      "beginCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.markdown.orbit" },
+        "3": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.tag.begin.html" },
+        "2": { "name": "entity.name.tag.markdown.orbit" },
+        "3": { "name": "punctuation.definition.tag.end.html" }
+      },
+      "contentName": "text.html.markdown",
+      "patterns": [
+        { "include": "text.html.markdown" }
       ]
     }
   },

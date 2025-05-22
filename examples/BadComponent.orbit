@@ -4,7 +4,7 @@
   </div>
 </template>
 
-<script>
+<code lang="rust">
 component badComponent {
   // Missing type annotations for props
   props {
@@ -19,7 +19,7 @@ component badComponent {
 
   // No public methods defined
 }
-</script>
+</code>
 
 <style>
 /* Skia-specific features that won't work with WebGPU */

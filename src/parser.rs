@@ -30,15 +30,20 @@ pub fn parse_orbit_file(content: &str, file_path: &str) -> Result<OrbitAst> {
                 let mut component_name = "MockComponent".to_string();
 
                 // Try to extract component name for better mock data
-                if let Some(script_start) = content.find("<script>") {
-                    if let Some(script_end) = content.find("</script>") {
-                        let script = &content[script_start..script_end];
-                        if let Some(comp_line) = script.lines().find(|l| l.contains("component ")) {
-                            if let Some(name_start) = comp_line.find("component ") {
-                                let after_keyword = &comp_line[name_start + 10..];
-                                if let Some(space_pos) = after_keyword.find('{') {
-                                    component_name = after_keyword[..space_pos].trim().to_string();
-                                }
+                let script_start = content.find("<script>")
+                    .or_else(|| content.find("<code>"))
+                    .or_else(|| content.find("<code lang=\"rust\">"));
+                
+                let script_end = content.find("</script>")
+                    .or_else(|| content.find("</code>"));
+                
+                if let (Some(script_start), Some(script_end)) = (script_start, script_end) {
+                    let script = &content[script_start..script_end];
+                    if let Some(comp_line) = script.lines().find(|l| l.contains("component ")) {
+                        if let Some(name_start) = comp_line.find("component ") {
+                            let after_keyword = &comp_line[name_start + 10..];
+                            if let Some(space_pos) = after_keyword.find('{') {
+                                component_name = after_keyword[..space_pos].trim().to_string();
                             }
                         }
                     }

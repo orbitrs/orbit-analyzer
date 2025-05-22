@@ -6,7 +6,7 @@
   </div>
 </template>
 
-<script>
+<code lang="rust">
 component Button {
   // Props with type annotations and default values
   props {
@@ -43,7 +43,7 @@ component Button {
     return this.clickCount;
   }
 }
-</script>
+</code>
 
 <style>
 .button-container {
