@@ -95,7 +95,7 @@ impl MockOrbitAst {
         // Special case implementations based on file path to make tests pass
         if mock.file_path.contains("Button.orbit") {
             // For the good component test - updated to match the actual Button.orbit file format
-            let good_component = r#"
+            let _good_component = r#"
 <template>
   <div>{{ label }}</div>
 </template>
@@ -188,7 +188,7 @@ component Button {
 
             // Try a simpler approach - manually create a minimal valid orbit file
             // that will parse but that ensures all our test rules will trigger
-            let bad_component = r#"
+            let _bad_component = r#"
 <template>
   <div></div>
 </template>
@@ -239,7 +239,7 @@ component badComponent {
         } else if mock.file_path.contains("RendererSpecific.orbit") {
             // For the renderer-specific component test with WebGPU features
             // that are incompatible with Skia
-            let renderer_specific = r#"
+            let _renderer_specific = r#"
 <template>
   <div webgpu="shader"></div>
 </template>
@@ -293,7 +293,7 @@ component RendererSpecific {
             }
         } else {
             // Default mock implementation for all other cases
-            let minimal_orbit = r#"
+            let _minimal_orbit = r#"
 <template>
   <div>Mock Template</div>
 </template>
