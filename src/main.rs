@@ -263,7 +263,7 @@ fn collect_orbit_files(
             let path = entry.path();
             collect_orbit_files(&path, files)?;
         }
-    } else if path.is_file() && path.extension().map_or(false, |ext| ext == "orbit") {
+    } else if path.is_file() && path.extension().is_some_and(|ext| ext == "orbit") {
         files.push(path.to_path_buf());
     }
 

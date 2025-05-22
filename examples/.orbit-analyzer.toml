@@ -34,12 +34,12 @@ pattern = "^[A-Z][a-zA-Z0-9]*$"  # PascalCase
 
 # Rule severity overrides
 [rule_severity]
-"non-empty-template" = "error"
-"public-function" = "info"
-"component-naming" = "warning"
-"prop-type-required" = "error"
-"state-variable-usage" = "warning"
-"renderer-compatibility" = "error"
+"non-empty-template" = "Error"
+"public-function" = "Info"
+"component-naming" = "Warning"
+"prop-type-required" = "Error"
+"state-variable-usage" = "Warning"
+"renderer-compatibility" = "Error"
 
 # Renderer-specific analysis settings
 [renderer_analysis]
@@ -54,5 +54,5 @@ check_renderer_metadata = true
 
 # Reporter configuration
 [reporter]
-# Minimum severity level to report ("error", "warning", "info")
-min_severity = "warning"
+# Minimum severity level to report ("Error", "Warning", "Info")
+min_severity = "Warning"

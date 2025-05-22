@@ -8,7 +8,7 @@ use std::fs;
 use std::path::Path;
 
 /// Configuration for the Orbit Analyzer
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Config {
     /// Analyzer settings
     #[serde(default)]
@@ -25,6 +25,10 @@ pub struct Config {
     /// Renderer analysis settings
     #[serde(default)]
     pub renderer_analysis: RendererAnalysisConfig,
+
+    /// Rule severity levels (flattened into rules.rule_severity during deserialization)
+    #[serde(default, rename = "rule_severity")]
+    rule_severity_tmp: HashMap<String, Severity>,
 }
 
 /// Analyzer settings
@@ -60,7 +64,7 @@ pub struct AnalyzerSettings {
 }
 
 /// Rules configuration
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct RulesConfig {
     /// Component naming rule configuration
     #[serde(default)]
@@ -131,16 +135,7 @@ fn default_renderer() -> String {
     "auto".to_string()
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            analyzer: AnalyzerSettings::default(),
-            rules: RulesConfig::default(),
-            reporter: ReporterConfig::default(),
-            renderer_analysis: RendererAnalysisConfig::default(),
-        }
-    }
-}
+// Default implementation is now derived
 
 impl Default for AnalyzerSettings {
     fn default() -> Self {
@@ -156,14 +151,7 @@ impl Default for AnalyzerSettings {
     }
 }
 
-impl Default for RulesConfig {
-    fn default() -> Self {
-        Self {
-            component_naming: ComponentNamingConfig::default(),
-            rule_severity: HashMap::new(),
-        }
-    }
-}
+// Default implementation is now derived
 
 impl Default for ComponentNamingConfig {
     fn default() -> Self {
@@ -197,7 +185,14 @@ impl Config {
     /// Load configuration from a file
     pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, Box<dyn std::error::Error>> {
         let content = fs::read_to_string(path)?;
-        let config: Config = toml::from_str(&content)?;
+        let mut config: Config = toml::from_str(&content)?;
+
+        // Move rule severities from the temporary field to the rules config
+        if !config.rule_severity_tmp.is_empty() {
+            config.rules.rule_severity = config.rule_severity_tmp.clone();
+            config.rule_severity_tmp.clear();
+        }
+
         Ok(config)
     }
 

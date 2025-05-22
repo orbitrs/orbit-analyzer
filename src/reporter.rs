@@ -5,19 +5,33 @@ use std::io::{self, Write};
 use std::path::Path;
 
 /// Issue severity
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Default)]
 pub enum Severity {
     /// Error - must be fixed
     Error,
     /// Warning - should be fixed
+    #[default]
     Warning,
     /// Info - suggested improvement
     Info,
 }
 
-impl Default for Severity {
-    fn default() -> Self {
-        Severity::Warning
+// Custom deserialization to handle case-insensitive strings
+impl<'de> Deserialize<'de> for Severity {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        match s.to_lowercase().as_str() {
+            "error" => Ok(Severity::Error),
+            "warning" => Ok(Severity::Warning),
+            "info" => Ok(Severity::Info),
+            _ => Err(serde::de::Error::custom(format!(
+                "Unknown severity level: {}. Expected one of: Error, Warning, Info",
+                s
+            ))),
+        }
     }
 }
 
@@ -194,7 +208,7 @@ impl Reporter {
     }
 
     /// Generate an HTML report for a single file
-    fn generate_html_report(&self, file_path: &str, issues: &[Issue]) -> String {
+    fn generate_html_report(&self, _file_path: &str, issues: &[Issue]) -> String {
         self.generate_html_report_all(issues)
     }
 
