@@ -33,14 +33,14 @@ jobs:
         run: |
           mkdir -p .cargo
           echo '[patch.crates-io]' > .cargo/config.toml
-          echo 'orbitrs = { path = "./orbitrs_dep" }' >> .cargo/config.toml
+          echo 'orbitrs = { path = "../orbitrs" }' >> .cargo/config.toml
           
       # Clone the orbitrs dependency
       - name: Clone orbitrs dependency
         uses: actions/checkout@v3
         with:
           repository: orbitrs/orbitrs
-          path: orbitrs_dep
+          path: ../orbitrs
           
       - name: Install system dependencies
         run: |
