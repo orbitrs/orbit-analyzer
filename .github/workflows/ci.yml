@@ -1,6 +1,8 @@
 name: CI
 
 # Improved CI workflow for orlint with proper dependency handling
+# Note: SDK improvements are considered non-essential as they're primarily used 
+# for personal development purposes. Core framework development is prioritized.
 
 on:
   push:
@@ -52,7 +54,7 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: orbitrs-workspace -> target
+          workspaces: "${{ github.workspace }}/orbitrs-workspace -> ${{ github.workspace }}/orbitrs-workspace/target"
           
       # Create a workspace Cargo.toml at the root
       - name: Create workspace Cargo.toml
@@ -123,7 +125,7 @@ jobs:
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: orbitrs-workspace -> target
+          workspaces: "${{ github.workspace }}/orbitrs-workspace -> ${{ github.workspace }}/orbitrs-workspace/target"
           key: ${{ matrix.target }}
       
       - name: Install system dependencies (Linux)
@@ -166,7 +168,21 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      # Create workspace directory for handling dependencies
+      - name: Create workspace directory
+        run: mkdir -p ${{ github.workspace }}/orbitrs-workspace
+
+      # Checkout repositories in workspace structure
+      - name: Checkout orlint
+        uses: actions/checkout@v4
+        with:
+          path: orbitrs-workspace/orlint
+
+      - name: Checkout orbit
+        uses: actions/checkout@v4
+        with:
+          repository: orbitrs/orbit
+          path: orbitrs-workspace/orbit
       
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@nightly
@@ -183,15 +199,35 @@ jobs:
         with:
           tool: cargo-llvm-cov
       
+      # Create workspace Cargo.toml at the root
+      - name: Create workspace Cargo.toml
+        working-directory: orbitrs-workspace
+        shell: bash
+        run: |
+          cat > Cargo.toml << 'EOF'
+          [workspace]
+          members = [
+              "orlint",
+              "orbit"
+          ]
+          resolver = "2"
+
+          [workspace.dependencies]
+          orbit = { path = "orbit", version = "0.1.10" }
+          serde = { version = "1.0", features = ["derive"] }
+          thiserror = "1.0"
+          EOF
+      
       - name: Cache dependencies
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: . -> target
+          workspaces: "${{ github.workspace }}/orbitrs-workspace -> ${{ github.workspace }}/orbitrs-workspace/target"
       
       - name: Generate code coverage
+        working-directory: orbitrs-workspace
         env:
-          RUSTFLAGS: "--cfg=web_sys_unstable_apis"
-        run: cargo llvm-cov --all-features --lcov --output-path lcov.info
+          RUSTFLAGS: "--cfg=web_sys_unstable_apis --cfg ignore_wayland_tests"
+        run: cargo llvm-cov --package orlint --all-features --lcov --output-path lcov.info
       
       # Add a delay between coverage generation and upload to help with rate limits  
       - name: Wait before upload
@@ -201,6 +237,8 @@ jobs:
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: orbitrs-workspace/lcov.info
+          fail_ci_if_error: false
 
   security-audit:
     name: Security Audit
