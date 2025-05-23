@@ -4,7 +4,7 @@ This document explains how the CI system is configured to handle the dependency 
 
 ## Overview
 
-The `orlint` CI workflow is designed to work in the Orbit Framework monorepo structure, where several related projects (orbitrs, orbiton, orbitkit, etc.) are developed together. This setup presents unique challenges for CI, particularly because of local dependency paths.
+The `orlint` CI workflow is designed to work in the Orbit Framework monorepo structure, where several related projects (orbitrs, orbiton, orbit component library, etc.) are developed together. This setup presents unique challenges for CI, particularly because of local dependency paths.
 
 ## Dependency Structure
 
