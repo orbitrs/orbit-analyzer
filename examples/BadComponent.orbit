@@ -18,6 +18,7 @@ component badComponent {
   }
 
   // No public methods defined
+  // No lifecycle methods implemented
 }
 </code>
 
