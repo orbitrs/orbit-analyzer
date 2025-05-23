@@ -156,7 +156,52 @@ jobs:
         working-directory: orbitrs-workspace
         run: RUSTFLAGS="--cfg ignore_wayland_tests" cargo test --package orlint --target ${{ matrix.target }} --all-features --verbose
         shell: bash
-        
+
+  # code-coverage
+  coverage:
+    name: Code Coverage
+    runs-on: ubuntu-latest
+    needs: check
+    # Only run coverage on main branch pushes to avoid rate limiting
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: llvm-tools-preview
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+      
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov
+      
+      - name: Cache dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> target
+      
+      - name: Generate code coverage
+        env:
+          RUSTFLAGS: "--cfg=web_sys_unstable_apis"
+        run: cargo llvm-cov --all-features --lcov --output-path lcov.info
+      
+      # Add a delay between coverage generation and upload to help with rate limits  
+      - name: Wait before upload
+        run: sleep 30
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest
