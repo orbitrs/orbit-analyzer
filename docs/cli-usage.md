@@ -2,6 +2,8 @@
 
 This document describes the command-line interface for Orbit Analyzer, including all available commands, options, and usage examples.
 
+For detailed information on configuring Orlint using the `.orlint.toml` file, please see the [Orlint Configuration Guide](./configuration.md).
+
 ## Basic Commands
 
 Orbit Analyzer provides several commands for different use cases:
