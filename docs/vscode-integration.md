@@ -37,6 +37,9 @@ The official Orbit VSCode Extension provides first-class support for .orbit file
 3. Search for "Orbit UI"
 4. Click "Install" on the "Orbit UI Tools" extension
 
+![Extension Installation](https://raw.githubusercontent.com/orbitrs/docs-assets/main/images/vscode/orbit-extension-install.png)
+*Figure 6: Installing the Orbit extension from the VS Code marketplace*
+
 ### Configuration
 
 The extension reads your project's `.orlint.toml` file automatically. You can also configure the extension through VSCode settings:
@@ -48,11 +51,48 @@ The extension reads your project's `.orlint.toml` file automatically. You can al
    - `orbit.analyzer.rules`: Specify which rules to enable (including new rules like lifecycle method checks)
    - `orbit.analyzer.severities`: Configure rule severities
 
+![Extension Settings](https://raw.githubusercontent.com/orbitrs/docs-assets/main/images/vscode/orbit-extension-settings.png)
+*Figure 7: Orbit extension settings panel*
+
+Key settings include:
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `orbit.linter.enabled` | Enable/disable linting | `true` |
+| `orbit.linter.runOnSave` | Run linter on file save | `true` |
+| `orbit.linter.executablePath` | Custom path to the orlint executable | `"orlint"` |
+| `orbit.preview.enabled` | Enable component preview panel | `true` |
+| `orbit.preview.refreshRate` | Preview refresh delay in ms | `500` |
+| `orbit.format.enabled` | Enable code formatting | `true` |
+
 > **Tip:** As new rules are added (e.g., lifecycle method checks, event handler naming, prop validation), you can enable or customize them in your `.orlint.toml` or via the extension settings. See the [Custom Lint Rules Guide](custom-lint-rules.md) and [Implementation Phases](roadmap/implementation-phases.md) for details.
 
 ### Usage
 
 Once installed, the extension automatically activates for any .orbit files. Linting issues will appear as squiggly underlines in your code and in the Problems panel.
+
+Here's what you can expect when using Orbit with Visual Studio Code:
+
+![Orbit VS Code Integration Overview](https://raw.githubusercontent.com/orbitrs/docs-assets/main/images/vscode/orbit-vscode-overview.png)
+*Figure 1: Orbit extension in VS Code showing component previews, linting, and syntax highlighting*
+
+#### Key Features
+
+1. **Syntax Highlighting** for `.orbit` files
+   ![Syntax Highlighting](https://raw.githubusercontent.com/orbitrs/docs-assets/main/images/vscode/orbit-syntax-highlighting.png)
+   *Figure 2: Detailed syntax highlighting for Orbit components*
+
+2. **Live Error Checking** with inline diagnostics
+   ![Error Checking](https://raw.githubusercontent.com/orbitrs/docs-assets/main/images/vscode/orbit-error-checking.png)
+   *Figure 3: Real-time error diagnostics for Orbit components*
+
+3. **Component Preview** with live reloading
+   ![Component Preview](https://raw.githubusercontent.com/orbitrs/docs-assets/main/images/vscode/orbit-component-preview.png)
+   *Figure 4: Live component preview panel*
+
+4. **Smart Completions** for Orbit APIs and markup
+   ![Smart Completions](https://raw.githubusercontent.com/orbitrs/docs-assets/main/images/vscode/orbit-completions.png)
+   *Figure 5: Intelligent code completion for Orbit components*
 
 ## Manual Integration
 
@@ -142,6 +182,26 @@ If you encounter issues with VSCode integration:
 3. Verify your `.orlint.toml` configuration is valid (especially for new rules)
 4. Look for error messages in the OUTPUT panel (View > Output) with "Tasks" selected
 5. See the [Troubleshooting Guide](troubleshooting.md) for platform-specific issues and solutions
+
+### Troubleshooting Extension Issues
+
+If you encounter issues with the extension, try these steps:
+
+1. **Check Extension Output**
+   - Open the Output panel (`Ctrl+Shift+U` or `Cmd+Shift+U`)
+   - Select "Orbit" from the dropdown menu
+   - Check for error messages
+
+   ![Extension Output](https://raw.githubusercontent.com/orbitrs/docs-assets/main/images/vscode/orbit-extension-output.png)
+   *Figure 8: Checking extension output for diagnostics*
+
+2. **Verify Orlint Installation**
+   - Open a terminal in VS Code
+   - Run `orlint --version` to verify the tool is installed and accessible
+
+3. **Reload the Extension**
+   - Open the Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+   - Search for and select "Developer: Reload Window"
 
 ## Roadmap and New Features
 
