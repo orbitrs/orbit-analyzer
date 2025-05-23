@@ -1,4 +1,4 @@
-# Orbit Analyzer
+# Orlint
 
 ![CI Status](https://github.com/orbitrs/orlint/actions/workflows/ci.yml/badge.svg)
 ![Release Status](https://github.com/orbitrs/orlint/actions/workflows/release.yml/badge.svg)
