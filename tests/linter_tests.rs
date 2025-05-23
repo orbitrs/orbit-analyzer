@@ -28,7 +28,7 @@ mod tests {
             .into_iter()
             .filter(|i| i.rule != "lifecycle-method")
             .collect();
-            
+
         // A well-formed component should have no non-lifecycle issues
         assert!(
             filtered_issues.is_empty(),
