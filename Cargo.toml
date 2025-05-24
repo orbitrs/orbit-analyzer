@@ -8,9 +8,9 @@ repository = "https://github.com/orbitrs/orlint"
 readme = "README.md"
 description = "Static analysis tool for Orbit UI framework files"
 
-[dependencies]
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 # Core dependencies
-orbit = { path = "../orbit" }
+orbit = { path = "../orbit", default-features = false }
 
 # Parser libraries
 syn = { version = "2.0", features = ["full", "extra-traits"] }
@@ -34,6 +34,29 @@ regex = "1.10"
 
 # Parallel processing
 rayon = "1.8"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# Core dependencies (WASM compatible only)
+orbit = { path = "../orbit", default-features = false, features = ["web"] }
+
+# Parser libraries (WASM compatible)
+syn = { version = "2.0", features = ["full", "extra-traits"] }
+quote = "1.0"
+proc-macro2 = "1.0"
+
+# Serialization (WASM compatible)
+serde.workspace = true
+serde_json = "1.0"
+toml = "0.8"
+
+# Error handling (WASM compatible)
+thiserror.workspace = true
+log = "0.4"
+
+# Regex support (WASM compatible)
+regex = "1.10"
+
+# Note: clap and rayon excluded from WASM builds as they're desktop-only tools
 
 [lib]
 name = "orlint"
