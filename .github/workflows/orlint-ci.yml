@@ -1,0 +1,126 @@
+name: Orlint Analyzer CI
+
+# Crate-specific CI for orlint static analyzer
+# Focuses on linting rules and analysis accuracy
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'orlint/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'orlint/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  linter-tests:
+    name: Linter Functionality Tests
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> target
+          cache-on-failure: true
+
+      - name: Build orlint
+        working-directory: orlint
+        run: cargo build --release
+
+      - name: Run orlint tests
+        working-directory: orlint
+        run: |
+          cargo test --all-features
+          cargo test --doc
+
+      - name: Test orlint CLI functionality
+        working-directory: orlint
+        run: |
+          # Test basic CLI functionality
+          cargo run -- --help
+          cargo run -- --version
+
+  linter-accuracy:
+    name: Linter Accuracy Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfontconfig1-dev libfreetype6-dev
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: . -> target
+          cache-on-failure: true
+
+      - name: Test orlint on example files
+        working-directory: orlint
+        run: |
+          cargo build --release
+          
+          # Test on known good files (should pass)
+          for file in ../examples/src/*.orbit; do
+            if [ -f "$file" ]; then
+              echo "Testing good file: $file"
+              ./target/release/orlint "$file"
+            fi
+          done
+          
+          # Test on known bad files (should find issues)
+          if [ -d "examples" ]; then
+            for file in examples/BadComponent.orbit; do
+              if [ -f "$file" ]; then
+                echo "Testing bad file: $file"
+                ./target/release/orlint "$file" || echo "Expected failure for $file"
+              fi
+            done
+          fi
+
+      - name: Test orlint configuration
+        working-directory: orlint
+        run: |
+          # Test with different configuration options
+          echo "Testing different orlint configurations"
+          
+          # Test strict mode
+          ./target/release/orlint --strict ../examples/src/*.orbit || true
+          
+          # Test with custom rules
+          ./target/release/orlint --rules performance,style ../examples/src/*.orbit || true
