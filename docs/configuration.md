@@ -1,50 +1,50 @@
-# Orlint Configuration (`.orlint.toml`)
+# Orlint Configuration Guide
 
-Orlint, the Orbit Analyzer, is configured using a TOML file named `.orlint.toml` located in your project's root directory. This file allows you to customize various aspects of the linting process, including enabled rules, file inclusion/exclusion, output formatting, and performance settings.
+Orlint, the Orbit Linter, is a powerful tool for analyzing your Orbit project to identify potential issues, enforce best practices, and optimize performance. It can be configured using an `.orlint.toml` file in your project root. This guide details the available configuration options.
 
-You can generate a sample configuration file by running `orlint init`.
+## Configuration File (`.orlint.toml`)
 
-## Top-Level Structure
+Create a file named `.orlint.toml` in the root directory of your Orbit project. If this file is not present, Orlint will use its default settings.
 
-The `.orlint.toml` file is organized into several sections (tables in TOML):
+## Top-Level Configuration
 
-- `[analyzer]`: Core settings for the analysis process.
-- `[analyzer.renderers]`: Configuration for renderer-specific rules.
-- `[files]`: Patterns for including and excluding files from analysis.
-- `[performance]`: Settings related to the performance of the analyzer.
-- `[rules.<rule_name>]`: Specific configuration for individual rules.
-- `[severity]`: Overrides for the default severity of specific rules.
+These settings apply globally to Orlint's behavior.
+
+*   `format`: Defines the output format for the analysis report.
+    *   Type: String
+    *   Default: `"text"`
+    *   Options: `"text"`, `"json"`, `"html"`
+    *   Example: `format = "json"`
+
+*   `min_severity`: Sets the minimum severity level for issues to be reported. Issues below this level will be ignored.
+    *   Type: String
+    *   Default: `"warning"`
+    *   Options: `"error"`, `"warning"`, `"info"`
+    *   Example: `min_severity = "info"`
+
+*   `fail_on`: Sets the minimum severity level that will cause Orlint to exit with a non-zero status code. This is useful for CI/CD pipelines.
+    *   Type: String
+    *   Default: `"error"`
+    *   Options: `"error"`, `"warning"`, `"info"`
+    *   Example: `fail_on = "warning"`
 
 ## `[analyzer]` Section
 
-This section controls the main behavior of Orlint.
+This section configures the core analysis engine.
 
-| Key             | Type          | Default   | Description                                                                                                                               |
-|-----------------|---------------|-----------|-------------------------------------------------------------------------------------------------------------------------------------------|
-| `rules`         | Array of Strings | `[]`      | A list of rule IDs to be enabled for analysis. Example: `["no-duplicate-ids", "accessibility"]`.                                       |
-| `exclude_rules` | Array of Strings | `[]`      | A list of rule IDs to be disabled, even if they are part of a group or enabled by default. Example: `["experimental-features"]`.         |
-| `format`        | String        | `"text"`  | The default output format for reports. Supported values: `"text"`, `"json"`, `"html"`. This can be overridden by the `--format` CLI option. |
-| `min_severity`  | String        | `"warning"` | The minimum severity level for issues to be reported. Supported values: `"error"`, `"warning"`, `"info"`.                             |
-| `fail_on`       | String        | `"error"`   | The minimum severity level that will cause Orlint to exit with a non-zero status code. Supported values: `"error"`, `"warning"`, `"info"`. |
+*   `rules`: An array of rule IDs or rule categories to be enabled for the analysis.
+    *   Type: Array of Strings
+    *   Default: (Orlint's default set of enabled rules)
+    *   Example: `rules = ["no-duplicate-ids", "accessibility", "performance-*"]` (Note: `performance-*` would be a glob pattern if supported, otherwise list individual rules)
+
+*   `exclude_rules`: An array of rule IDs or rule categories to be disabled.
+    *   Type: Array of Strings
+    *   Default: Empty array
+    *   Example: `exclude_rules = ["experimental-features", "skia-specific-rule"]`
 
 ### `[analyzer.renderers]` Sub-Section
 
-This sub-section within `[analyzer]` configures renderer-specific linting.
-
-| Key              | Type    | Default | Description                                                                    |
-|------------------|---------|---------|--------------------------------------------------------------------------------|
-| `skia`           | Boolean | `false` | If `true`, enables rules specific to the Skia rendering pipeline.                |
-| `webgpu`         | Boolean | `false` | If `true`, enables rules specific to the WebGPU rendering pipeline.              |
-| `cross_renderer` | Boolean | `true`  | If `true`, enables rules that check for compatibility across multiple renderers. |
-
-## `[files]` Section
-
-This section defines which files Orlint should analyze.
-
-| Key       | Type          | Default                                  | Description                                                                                                                                  |
-|-----------|---------------|------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------|
-| `include` | Array of Strings | `["**/*.orbit"]`                       | An array of glob patterns specifying which files to include in the analysis.                                                                 |
-| `exclude` | Array of Strings | `["**/node_modules/**", "**/dist/**"]` | An array of glob patterns specifying which files or directories to exclude from analysis. Exclusions typically cover third-party code or build outputs. |
+Configure renderer-specific rule sets.
 
 ## `[performance]` Section
 
