@@ -1,10 +1,77 @@
 # Creating Custom Lint Rules for Orlint
 
-This document explains how to create custom lint rules for Orlint, the Orbit Analyzer. Custom rules allow you to enforce project-specific coding standards, identify potential bugs, or encourage best practices within your `.orbit` files.
+This document explains how to create custom lint rules for Orlint, the Orbit Analyzer. Custom rules allow you to enforce project-specific coding standards, identify potential bugs, and encourage best practices within your `.orbit` files.
 
 ## Overview
 
 Orlint's custom rule system is built around the `Rule` trait, typically found in `orlint/src/rules.rs` (or a similar path within the Orlint codebase). By implementing this trait, you can define the logic for identifying specific patterns or issues in the Abstract Syntax Tree (AST) of `.orbit` files.
+
+### When to Create Custom Rules
+
+**Good Candidates for Custom Rules:**
+- Project-specific naming conventions
+- Organization-specific security requirements
+- Team coding standards not covered by built-in rules
+- Domain-specific accessibility requirements
+- Custom component patterns and anti-patterns
+- Integration with internal tools and services
+
+**Consider Built-in Rules First:**
+- Common accessibility issues (use built-in `accessibility` rules)
+- Standard performance optimizations (use built-in `performance` rules)
+- General security vulnerabilities (use built-in `security` rules)
+
+## Development Workflow
+
+### 1. Planning Your Rule
+
+Before writing code, define your rule clearly:
+
+```markdown
+## Rule: require-data-testid
+
+**Purpose**: Ensure all interactive elements have data-testid attributes for testing
+
+**Triggers**: Missing data-testid on buttons, inputs, links, and custom interactive components
+
+**Severity**: Warning (can be overridden)
+
+**Examples**:
+❌ Bad: `<button @click="handleClick">Submit</button>`
+✅ Good: `<button data-testid="submit-btn" @click="handleClick">Submit</button>`
+
+**Configuration**:
+- `required_elements`: Array of element types that need data-testid
+- `ignore_disabled`: Skip disabled elements
+- `prefix_pattern`: Required prefix pattern for testid values
+```
+
+### 2. Setting Up Development Environment
+
+```bash
+# Clone Orlint repository
+git clone https://github.com/orbitrs/orlint
+cd orlint
+
+# Create development branch
+git checkout -b feature/require-data-testid
+
+# Set up development environment
+cargo build
+cargo test
+
+# Verify you can run Orlint
+cargo run -- analyze ../test-project
+```
+
+### 3. Creating Rule Structure
+
+```bash
+# Create new rule file
+mkdir -p src/rules/testing
+touch src/rules/testing/data_testid.rs
+touch src/rules/testing/mod.rs
+```
 
 ## The `Rule` Trait
 
@@ -18,12 +85,22 @@ use orlint::core::{OrbitAst, Issue, Severity}; // Hypothetical paths
 pub trait Rule {
     /// A unique identifier for the rule.
     /// Used in configuration files and error messages.
-    /// Conventionally, use kebab-case (e.g., "my-custom-rule").
+    /// Conventionally, use kebab-case (e.g., "require-data-testid").
     fn name(&self) -> &'static str;
 
     /// A brief description of what the rule checks for and why it's important.
     /// This is often used for documentation generation (e.g., `orlint list-rules`).
     fn description(&self) -> &'static str;
+
+    /// Rule category for organization and filtering
+    fn category(&self) -> RuleCategory {
+        RuleCategory::BestPractices
+    }
+
+    /// Default severity level for this rule
+    fn default_severity(&self) -> Severity {
+        Severity::Warning
+    }
 
     /// The core logic of the rule.
     /// This method receives the AST of an `.orbit` file and its path.
@@ -31,24 +108,29 @@ pub trait Rule {
     /// or an error string if the rule itself encounters an issue during processing.
     fn check(&self, ast: &OrbitAst, file_path: &str) -> Result<Vec<Issue>, String>;
 
-    // Optional: Some rule systems might include a method to specify default severity
-    // fn default_severity(&self) -> Severity {
-    //     Severity::Warning
-    // }
+    /// Optional: Configure the rule with settings from .orlint.toml
+    fn configure(&mut self, config: &RuleConfig) -> Result<(), String> {
+        // Default implementation does nothing
+        Ok(())
+    }
 
-    // Optional: Some rule systems might allow rules to be configurable
-    // fn configure(&mut self, config: &RuleConfig) -> Result<(), String> {
-    //     // Process configuration for this rule
-    //     Ok(())
-    // }
+    /// Optional: Provide an automatic fix for issues found by this rule
+    fn auto_fix(&self, issue: &Issue, ast: &mut OrbitAst) -> Result<bool, String> {
+        // Default implementation provides no fixes
+        Ok(false)
+    }
 }
 ```
 
 The `Issue` struct typically contains:
-- `rule_name`: The name of the rule that generated the issue.
-- `message`: A descriptive message explaining the issue.
-- `file_path`: The path to the file where the issue was found.
-- `line`: The line number of the issue.
+- `rule_name`: The name of the rule that generated the issue
+- `message`: A descriptive message explaining the issue
+- `file_path`: The path to the file where the issue was found
+- `line`: The line number of the issue
+- `column`: The column number of the issue
+- `severity`: The severity of the issue (e.g., `Error`, `Warning`, `Info`)
+- `suggestion`: (Optional) A suggested fix or code snippet
+- `fix_available`: Whether an automatic fix is available
 - `column`: The column number of the issue.
 - `severity`: The severity of the issue (e.g., `Error`, `Warning`, `Info`).
 - `suggestion`: (Optional) A suggested fix or code snippet.
