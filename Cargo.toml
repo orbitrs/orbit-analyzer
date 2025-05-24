@@ -36,9 +36,6 @@ regex = "1.10"
 rayon = "1.8"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-# Core dependencies (WASM compatible only)
-orbit = { path = "../orbit", default-features = false, features = ["web"] }
-
 # Parser libraries (WASM compatible)
 syn = { version = "2.0", features = ["full", "extra-traits"] }
 quote = "1.0"
