@@ -32,8 +32,7 @@ mod tests {
         // A well-formed component should have no non-lifecycle issues
         assert!(
             filtered_issues.is_empty(),
-            "Expected no issues but found: {:?}",
-            filtered_issues
+            "Expected no issues but found: {filtered_issues:?}"
         );
     }
 
@@ -117,8 +116,7 @@ mod tests {
         assert!(!issues.is_empty(), "Expected issues but found none");
         assert!(
             issues.iter().all(|i| i.rule == "component-naming"),
-            "Found issues for rules that should be disabled: {:?}",
-            issues
+            "Found issues for rules that should be disabled: {issues:?}"
         );
     }
 
