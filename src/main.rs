@@ -154,7 +154,7 @@ fn analyze_command(args: AnalyzeArgs) -> Result<(), Box<dyn std::error::Error>> 
             }
         }
         Err(e) => {
-            eprintln!("Error analyzing files: {}", e);
+            eprintln!("Error analyzing files: {e}");
             process::exit(1);
         }
     }
@@ -183,22 +183,22 @@ fn validate_command(args: ValidateArgs) -> Result<(), Box<dyn std::error::Error>
         match std::fs::read_to_string(&file) {
             Ok(content) => match orlint::parser::parse_orbit_file(&content, &file_path) {
                 Ok(_) => {
-                    println!("✅ {}: Valid", file_path);
+                    println!("✅ {file_path}: Valid");
                 }
                 Err(e) => {
-                    eprintln!("❌ {}: {}", file_path, e);
+                    eprintln!("❌ {file_path}: {e}");
                     error_count += 1;
                 }
             },
             Err(e) => {
-                eprintln!("Error reading {}: {}", file_path, e);
+                eprintln!("Error reading {file_path}: {e}");
                 error_count += 1;
             }
         }
     }
 
     if error_count > 0 {
-        eprintln!("{} files had validation errors", error_count);
+        eprintln!("{error_count} files had validation errors");
         process::exit(1);
     } else {
         println!("All files are valid");
@@ -245,8 +245,8 @@ fn list_rules_command() -> Result<(), Box<dyn std::error::Error>> {
     ];
 
     for (name, desc, severity) in rules {
-        println!("  - {} ({})", name, severity);
-        println!("      {}", desc);
+        println!("  - {name} ({severity})");
+        println!("      {desc}");
     }
 
     Ok(())

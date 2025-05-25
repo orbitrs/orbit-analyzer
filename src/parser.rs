@@ -80,8 +80,7 @@ pub fn parse_orbit_file(content: &str, file_path: &str) -> Result<OrbitAst> {
             } else {
                 // For non-test files, still return the original error
                 Err(AnalyzerError::Parser(format!(
-                    "Failed to parse {}: {}",
-                    file_path, err_msg
+                    "Failed to parse {file_path}: {err_msg}"
                 )))
             }
         }
@@ -233,7 +232,7 @@ component badComponent {
             // Parse the valid component
             match OrbitParser::parse(component_content) {
                 Ok(ast) => ast,
-                Err(e) => panic!("Failed to create mock AST for BadComponent.orbit: {}", e),
+                Err(e) => panic!("Failed to create mock AST for BadComponent.orbit: {e}"),
             }
         } else if std::path::Path::new(&mock.file_path)
             .file_name()
@@ -289,10 +288,7 @@ component RendererSpecific {
 "#;
             match OrbitParser::parse(component_content) {
                 Ok(ast) => ast,
-                Err(e) => panic!(
-                    "Failed to create mock AST for RendererSpecific.orbit: {}",
-                    e
-                ),
+                Err(e) => panic!("Failed to create mock AST for RendererSpecific.orbit: {e}"),
             }
         } else {
             // Default mock implementation for all other cases
@@ -346,10 +342,7 @@ component MockComponent {
                     ast.script.component_name = mock.component_name.clone();
                     ast
                 }
-                Err(e) => panic!(
-                    "Failed to create mock AST - this should never happen: {}",
-                    e
-                ),
+                Err(e) => panic!("Failed to create mock AST - this should never happen: {e}"),
             }
         }
     }

@@ -28,8 +28,7 @@ impl<'de> Deserialize<'de> for Severity {
             "warning" => Ok(Severity::Warning),
             "info" => Ok(Severity::Info),
             _ => Err(serde::de::Error::custom(format!(
-                "Unknown severity level: {}. Expected one of: Error, Warning, Info",
-                s
+                "Unknown severity level: {s}. Expected one of: Error, Warning, Info"
             ))),
         }
     }
@@ -139,15 +138,15 @@ impl Reporter {
         let mut output = String::new();
 
         if issues.is_empty() {
-            output.push_str(&format!("{}: No issues found\n", file_path));
+            output.push_str(&format!("{file_path}: No issues found\n"));
             return output;
         }
 
-        output.push_str(&format!("{}: {} issues found\n", file_path, issues.len()));
+        output.push_str(&format!("{file_path}: {} issues found\n", issues.len()));
 
         for issue in issues {
             output.push_str(&format!(
-                "  {}:{}:{}: [{}] {} ({})\n",
+                "  {0}:{1}:{2}: [{3}] {4} ({5})\n",
                 issue.file, issue.line, issue.column, issue.severity, issue.message, issue.rule,
             ));
         }
@@ -281,15 +280,9 @@ impl Reporter {
             files.len()
         ));
         html.push_str("        <ul>\n");
-        html.push_str(&format!("            <li>Errors: {}</li>\n", error_count));
-        html.push_str(&format!(
-            "            <li>Warnings: {}</li>\n",
-            warning_count
-        ));
-        html.push_str(&format!(
-            "            <li>Information: {}</li>\n",
-            info_count
-        ));
+        html.push_str(&format!("            <li>Errors: {error_count}</li>\n"));
+        html.push_str(&format!("            <li>Warnings: {warning_count}</li>\n"));
+        html.push_str(&format!("            <li>Information: {info_count}</li>\n"));
         html.push_str("        </ul>\n");
         html.push_str("    </div>\n");
 
@@ -303,7 +296,7 @@ impl Reporter {
             for (file, file_issues) in files {
                 html.push_str("    <div class=\"file\">\n");
                 html.push_str("        <div class=\"file-header\">\n");
-                html.push_str(&format!("            <h3>{}</h3>\n", file));
+                html.push_str(&format!("            <h3>{file}</h3>\n"));
                 html.push_str(&format!(
                     "            <p>{} issues</p>\n",
                     file_issues.len()
@@ -321,10 +314,7 @@ impl Reporter {
                         Severity::Info => "info",
                     };
 
-                    html.push_str(&format!(
-                        "        <div class=\"issue {}\">\n",
-                        severity_class
-                    ));
+                    html.push_str(&format!("        <div class=\"issue {severity_class}\">\n"));
                     html.push_str(&format!(
                         "            <div class=\"rule\">{}</div>\n",
                         issue.rule
@@ -380,7 +370,7 @@ impl Reporter {
                 let stdout = io::stdout();
                 let mut handle = stdout.lock();
                 if let Err(e) = handle.write_all(output.as_bytes()) {
-                    eprintln!("Error writing to stdout: {}", e);
+                    eprintln!("Error writing to stdout: {e}");
                 }
             }
         }
