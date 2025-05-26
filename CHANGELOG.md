@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added proper error handling for parsing issues
 - Cross-platform path handling for Windows compatibility
 - Improved test file detection across operating systems
+- Fixed compiler warnings with appropriate allow attributes
+- Resolved unused code warnings in analysis modules
 
 ## [0.1.0] - 2025-05-21
 - Initial public release
